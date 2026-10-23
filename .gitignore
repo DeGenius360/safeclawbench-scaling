@@ -1,0 +1,9 @@
+# secrets and bulky artefacts: never commit these
+*.env
+keys.env
+*.zip
+__pycache__/
+.venv/
+.ipynb_checkpoints/
+# held back until the blind adjudication has been scored; delete this line afterwards
+answer_key*
