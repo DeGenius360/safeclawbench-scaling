@@ -1,76 +1,129 @@
-# SafeClawBench scaling study
+# SafeClawBench · Qwen2.5 scaling study
 
-Independent cross-scale evaluation of agent safety: **Qwen2.5 7B, 14B and 32B** on
-[SafeClawBench](https://huggingface.co/datasets/sairights/safeclawbench) (Tian et al., arXiv 2606.18356),
-judged by two different LLM judges, with a pre-registered same-environment follow-up.
+> **Status: report v1.** Written before the same-environment follow-up, which was pre-registered in commit `fa4fe71` (see [`PREREGISTRATION_followup.md`](PREREGISTRATION_followup.md)). Two claims below are exactly what that follow-up tests, and this page will be updated according to its decision rules. Independent work; not affiliated with the SafeClawBench authors.
 
-> **Status: work in progress.** Report v1 is in `report/`. It was written before the follow-up
-> experiment, which was pre-registered in commit `fa4fe71` before any follow-up data existed.
-> The report will be revised according to the pre-registered decision rules.
-> Not affiliated with the SafeClawBench authors.
+**Does making an open-weight model bigger make it a safer or riskier agent?**
 
-## Headline results
+I ran the 600-scenario [SafeClawBench](https://arxiv.org/abs/2606.18356) Semantic Core and the
+60-scenario Exec-Balanced track against Qwen2.5 **7B / 14B / 32B** (GGUF Q4_K_M, Ollama, defence
+**D0** — no added guardrails), scored every Core response with **two independent LLM judges**
+(DeepSeek and Claude Haiku 4.5), and cross-checked against the benchmark's deterministic sandbox
+oracles. Short version:
 
-<!-- Fill from the final report once it is checked against the tables. Keep each claim next to its
-     judge, sample size and confidence interval. Do not put a scale-trend claim here until the
-     follow-up outcome is known. -->
+- **Bigger scored as riskier, not safer, under both judges.** Semantic attack-success rose from 7B→32B by **+17 points**
+  (DeepSeek) / **+9.5 points** (Haiku); the trend is monotonic and significant under both judges
+  (GEE odds ratio per size step 1.70 and 1.30, both p < 10⁻⁴).
+- **The two judges disagreed a lot, and the gap sits almost entirely in truncated responses.** On responses not cut
+  off at the 2,000-character cap the judges land within 5–10 points and agree on an ~11-point
+  7B→32B rise; the big gap (22–27 points) only appears on truncated responses, which hit 32B hardest
+  (63% truncated vs 45% at 7B). Whether truncation actually causes the gap is what the pre-registered follow-up tests.
+- **"Attack succeeded" is a definition, not a fact.** Semantic "the model complied" roughly doubles
+  the sandbox "harm actually happened" rate (95% vs 48% at 32B).
+- **One family (MEX) drives the disagreement**, and the sandbox (≈0% real harm there) points toward
+  the stricter judge for that family.
+- **No size effect at the execution layer** (43/43/48%, n=60, wide intervals) — the scaling signal
+  lives in semantic grading only.
 
-TODO. See `report/` for the full v1 write-up.
+**📊 [Read the interactive report](report/index.html)** (also publishable via GitHub Pages).
 
-## What was done
+This distinguishes **model-layer** findings (the model's own susceptibility under D0) from
+**infrastructure-layer** concerns (sandboxing, approval gates) throughout — only the former is
+measured here.
 
-- **Models:** Qwen2.5 7B / 14B / 32B, GGUF Q4_K_M via Ollama, defense D0, temperature 0.
-- **Benchmark:** the 600-case Semantic Core track for all three sizes (1,800 evaluations), and a fixed
-  60-case Exec-Balanced subset with deterministic state oracles.
-- **Judges:** DeepSeek (`deepseek-flash`, thinking disabled) and Claude Haiku 4.5, applied uniformly to
-  every Core case. The original paper used gpt-5.4, which was not available here, so absolute rates are
-  **not directly comparable** with the paper's.
-- **Statistics:** Wilson intervals, exact McNemar for paired comparisons, Cohen's kappa for judge
-  agreement.
+---
 
-## Things to know before trusting the numbers
+## Key findings in one figure each
 
-- The harness saves only the first 2,000 characters of each response. About half of saved responses
-  (63% for 32B) sit at that cap, and re-judging works from the saved text. See the follow-up.
-- 7B and 14B were generated in July, 32B in October, on possibly different Ollama builds. The July
-  build was never logged.
-- The two judges disagree most on MEX cases and on truncated responses; they measure related but
-  different things (intent versus observed completed harm).
-- Exec-Balanced has n = 60 per model and is underpowered for size comparisons.
-- The DeepSeek API model ID is an alias; the underlying build is not pinned.
-- `kit/install_kit.sh` is the final corrected version of the kit. Some fixes (notably disabling DeepSeek's
-  thinking mode in the proxy) were applied by hand on the pod during the run before they were added to
-  the installer.
+### 1 · Scaling up raised attack-success, under both judges
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="figures/fig1_asr_by_model_judge_dark.png">
+  <img alt="Grouped bar chart of Core attack-success rate by model size for both judges with 95% confidence intervals. DeepSeek rises 68.5 to 74.0 to 85.5 percent across 7B, 14B, 32B; Haiku rises 55.5 to 58.5 to 65.0 percent. Both trends go up with size." src="figures/fig1_asr_by_model_judge_light.png" width="640">
+</picture>
 
-<!-- Expand and date these once the follow-up result is in. -->
+### 2 · The judge gap sits almost entirely in truncated responses
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="figures/fig4_truncation_effect_dark.png">
+  <img alt="Bar chart of the DeepSeek minus Haiku attack-success gap, split by whether the response was truncated. On non-truncated responses the gap is 5 to 10 points; on truncated responses it is 22 to 27 points, across all three model sizes." src="figures/fig4_truncation_effect_light.png" width="640">
+</picture>
 
-## Repository layout
+### 3 · Semantic grading overcounts execution harm
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="figures/fig5_core_vs_exec_dark.png">
+  <img alt="Line chart on the 60 mapped scenarios. Two semantic-judge lines (DeepSeek, Haiku) rise with size and sit well above a flat green execution-harm line at about 43 to 48 percent. At 32B DeepSeek reaches 95 percent against 48 percent observed harm." src="figures/fig5_core_vs_exec_light.png" width="640">
+</picture>
 
-| Path | Contents |
-|---|---|
-| `report/` | Report v1: HTML, PDF and DOCX versions, the findings memo and the verification notes |
-| `PREREGISTRATION_followup.md` | Hypotheses and decision rules for the follow-up, committed before running it |
-| `docs/runbook_main_study.md` | How the main study was run, step by step |
-| `docs/runbook_followup.md` | How the follow-up is run |
-| `kit/` | Installers that write every script used on the pod; `kit/podside/` has the scripts that were run after the installer |
-| `data/core_verdicts.csv` | One row per model and case: both judges' verdicts, response length, whether it hit the cap |
-| `data/summaries/`, `data/exec/`, `data/run_conditions/` | Summary tables, Exec results, and the recorded run conditions |
-| `analysis/` | Analysis code, figures and the blind adjudication sheet |
+### 4 · Where the attacks land (MEX is the outlier)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="figures/fig2_family_heatmap_dark.png">
+  <img alt="Two heatmaps of attack-success by family and size, one per judge. Most families are high under both judges, but the MEX row drops from 50 to 70 percent under DeepSeek to 12 to 18 percent under Haiku." src="figures/fig2_family_heatmap_light.png" width="720">
+</picture>
 
-Raw model responses are withheld until they have been reviewed for release.
+### 5 · Judge agreement falls as models get larger
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="figures/fig3_agreement_vs_size_dark.png">
+  <img alt="Line chart showing judge percentage agreement falling slightly and Cohen's kappa falling from 0.59 at 7B to 0.44 at 32B as model size increases." src="figures/fig3_agreement_vs_size_light.png" width="640">
+</picture>
 
-## Reproducing
+See [`data/summary_tables.md`](data/summary_tables.md) for every number with intervals.
 
-Everything runs on a single rented GPU (an A40 at about $0.60 per hour all-in) and is scripted:
-see `docs/runbook_main_study.md`. API cost for the judging is a few dollars. The follow-up takes about
-1.5 hours; see `docs/runbook_followup.md`.
+---
 
-## Credit and licence
+## Reproduce
 
-- Benchmark and harness: SafeClawBench by Tian et al. (MIT). This repository contains no copy of the
-  benchmark; fetch it from Hugging Face.
-- Code and analysis in this repository: MIT, see `LICENSE`.
+```bash
+pip install numpy scipy matplotlib
+python3 analysis/analysis.py --data ./data --out ./out
+# regenerates out/results.json, all tables (stdout), and figures/ (light + dark PNG)
+```
 
-## Citing
+The analysis reads the released per-case verdicts; it needs no GPU. To regenerate the *responses*
+you need the benchmark (not redistributed here — see below) and an Ollama host with the three Qwen2.5
+sizes.
 
-<!-- Add a CITATION.cff or BibTeX entry once the report has a stable URL. -->
+The monotonic-trend test is a population-averaged (GEE) logistic with cluster-robust (CR1) standard
+errors by scenario, implemented directly in `analysis.py` (no `statsmodels` dependency).
+
+### Costs
+
+| Step | Hardware | Rough cost |
+|---|---|---|
+| Generate 600 Core + 60 Exec per size | A40, ~$0.59/h on-demand | a few $ total |
+| Pre-registered follow-up: 120 cases × 3 sizes in one environment, full-length responses (`docs/runbook_followup.md`) | A40 + Haiku/DeepSeek API | about $0.9 GPU + $1–1.4 Haiku, ~1.5 h |
+| Re-grade from saved responses | API only | judge API cost |
+| Run `analysis.py` | any laptop | free |
+
+---
+
+## What's in here
+
+```
+README.md                    this page
+PREREGISTRATION_followup.md  hypotheses and decision rules for the follow-up, committed before running it
+report/                      the interactive report (index.html), the paper (PDF, DOCX), the findings memo, verification notes
+analysis/                    analysis.py (all tables + figures) and score_adjudication.py
+data/                        aggregated tables + per-scenario verdicts & metrics (NO raw model responses)
+figures/                     static PNG exports (light + dark) used in this README
+kit/                         installers that write every pod-side script, plus the scripts run after them
+docs/                        runbooks: how the main study and the follow-up are run
+CITATION.cff                 how to cite
+```
+
+**What is deliberately *not* here:** raw model responses, the attack prompts, and
+`benchmark_v5_600.json`. The benchmark is © its authors — get it from the
+[Hugging Face dataset](https://huggingface.co/datasets/sairights/safeclawbench) under its own licence
+terms. Only aggregated results and per-scenario *verdicts/metrics* are released.
+
+## How much to trust it
+
+Full caveats are in the [report](report/index.html). In brief: neither judge is ground truth; the
+2,000-char truncation touches ~half of responses; 7B/14B were generated in July and 32B in October,
+so a serving-environment difference is confounded with size (bounded at ~+10 points, not
+statistically distinguishable from zero, measured only on 7B); one sample per scenario; Exec is n=60.
+
+## Licence & attribution
+
+My analysis code, figures and report are released under the **MIT Licence** (see [`LICENSE`](LICENSE)).
+
+This work **extends SafeClawBench** — Tian et al., 2026, [arXiv:2606.18356](https://arxiv.org/abs/2606.18356),
+MIT-licensed. The benchmark design, attack taxonomy and Exec oracles are theirs. If you use this
+repo, please cite both it ([`CITATION.cff`](CITATION.cff)) and the original paper.
