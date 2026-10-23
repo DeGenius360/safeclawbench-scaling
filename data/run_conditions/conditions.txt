@@ -1,0 +1,8 @@
+--- conditions 2026-10-23T12:36:15Z ---
+ollama version is 0.40.9
+NAME           ID              SIZE      MODIFIED           
+qwen2.5:32b    9f13ba1299af    19 GB     4 seconds ago         
+qwen2.5:14b    7cdf5a0187d5    9.0 GB    About a minute ago    
+qwen2.5:7b     845dbda0ea48    4.7 GB    About a minute ago    
+parallel=4 ctx=8192
+repo e6c2920
