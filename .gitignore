@@ -7,3 +7,8 @@ __pycache__/
 .ipynb_checkpoints/
 # held back until the blind adjudication has been scored; delete this line afterwards
 answer_key*
+*.pyc
+out/
+.env
+*.key
+.DS_Store

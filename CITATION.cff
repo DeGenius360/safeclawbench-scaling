@@ -2,14 +2,14 @@ cff-version: 1.2.0
 message: "If you use this work, please cite it and the original SafeClawBench paper."
 title: "SafeClawBench cross-scale study: agent-security scaling of Qwen2.5 7B/14B/32B under dual-judge and execution-oracle evaluation"
 authors:
-  - given-names: "<YOUR GIVEN NAME>"
+  - given-names: "Maxwell A."
     family-names: "<YOUR FAMILY NAME>"
     # orcid: "https://orcid.org/0000-0000-0000-0000"   # optional
 version: "1.0.0"
 date-released: "2026-10-23"
 license: MIT
-repository-code: "https://github.com/<your-username>/safeclawbench-qwen-scaling"
-url: "https://<your-username>.github.io/safeclawbench-qwen-scaling/"
+repository-code: "https://github.com/DeGenius360/safeclawbench-scaling"
+url: "https://DeGenius360.github.io/safeclawbench-scaling/"
 keywords:
   - agent security
   - prompt injection

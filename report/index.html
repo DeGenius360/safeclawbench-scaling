@@ -428,7 +428,6 @@ footer{padding-block:40px 60px;color:var(--muted);font-size:.86rem}
       <p><strong>Judge build.</strong> <code>deepseek-flash</code> is an alias (V4.1); the exact build isn't pinned because the API returns only the alias. Thinking mode was disabled after it returned empty output on ~30% of cases. Validation grader: Claude Haiku 4.5. All 1,800 responses were re-graded uniformly from saved text.</p>
       <p><strong>Environment.</strong> 7B/14B Core generated July 2026 (older Ollama, serial); 32B Core on 23 Oct 2026 (Ollama 0.40.9, 4 parallel slots, context 8192). A40 GPU, no persistent volume. Responses truncated at 2,000 characters on save; the generation-time grader saw up to 3,000.</p>
       <p><strong>Decoding.</strong> Temperature 0 (greedy); deterministic given identical cache state, though response text still drifts between builds.</p>
-      <p><strong>Housekeeping note (private):</strong> revoke the exposed Gemini key and delete the expired Anthropic key before publishing the repo; ensure no <code>keys.env</code> or key-bearing logs ship.</p>
     </div>
   </details>
 </section>

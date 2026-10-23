@@ -11,3 +11,9 @@ Aggregated results and per-scenario verdicts. **No raw model responses or attack
   `*_success` is 1/0. `resp_len` is the saved (truncated-at-2000) character count.
 - `exec_per_case.csv` — one row per (model, scenario) for the 60-case Exec track:
   `case_id, model, family, harm_completion, state_change, tool_call, blocked_by_harness` (all 1/0).
+
+Also in this folder (provenance for the numbers above):
+
+- `summaries/` — the tables written by the Haiku validation run.
+- `exec/` — per-model summaries from the Exec-Balanced runs.
+- `run_conditions/` — recorded Ollama build and model digests, judge builds and the calibration log.
