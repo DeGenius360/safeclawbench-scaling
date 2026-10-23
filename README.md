@@ -5,7 +5,7 @@ Independent cross-scale evaluation of agent safety: **Qwen2.5 7B, 14B and 32B** 
 judged by two different LLM judges, with a pre-registered same-environment follow-up.
 
 > **Status: work in progress.** Report v1 is in `report/`. It was written before the follow-up
-> experiment, which was pre-registered in commit `{{PREREG_COMMIT}}` before any follow-up data existed.
+> experiment, which was pre-registered in commit `fa4fe71` before any follow-up data existed.
 > The report will be revised according to the pre-registered decision rules.
 > Not affiliated with the SafeClawBench authors.
 
