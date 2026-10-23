@@ -1,0 +1,707 @@
+<title>Bigger isn't safer</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,900&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: single reading column (~720px) with full-bleed bands for the key visuals;
+   editorial serif headlines over a technical sans/mono body. */
+:root{
+  color-scheme: light;
+  --bg:#f5f6f7; --surface:#ffffff; --surface-2:#eef0f2;
+  --fg:#14171b; --muted:#5a616a; --faint:#878e97; --border:#dde1e6;
+  --accent:#1c5cab; --accent-soft:#e7eefb;
+  --ds:#2a78d6; --hk:#eb6834; --exec:#1baf7a;
+  --good:#1a7f37; --warn:#b7791f; --bad:#d23b3a;
+  --ds-soft:#dbe8fb; --hk-soft:#fbe3d6;
+  --shadow:0 1px 2px rgba(20,23,27,.06),0 6px 20px rgba(20,23,27,.06);
+  --maxw:720px;
+  --f-display:"Fraunces",Georgia,"Times New Roman",serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --bg:#111317; --surface:#1a1d22; --surface-2:#22262c;
+    --fg:#eceef1; --muted:#9aa2ac; --faint:#727a84; --border:#2b3037;
+    --accent:#6ea8ff; --accent-soft:#17243a;
+    --ds:#3987e5; --hk:#d95926; --exec:#2bb888;
+    --good:#4ac26b; --warn:#e0a52a; --bad:#ef6b6a;
+    --ds-soft:#15233a; --hk-soft:#331a10;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 26px rgba(0,0,0,.4);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --bg:#111317; --surface:#1a1d22; --surface-2:#22262c;
+  --fg:#eceef1; --muted:#9aa2ac; --faint:#727a84; --border:#2b3037;
+  --accent:#6ea8ff; --accent-soft:#17243a;
+  --ds:#3987e5; --hk:#d95926; --exec:#2bb888;
+  --good:#4ac26b; --warn:#e0a52a; --bad:#ef6b6a;
+  --ds-soft:#15233a; --hk-soft:#331a10;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 26px rgba(0,0,0,.4);
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);line-height:1.6;font-size:17px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:var(--maxw);margin-inline:auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--f-display);font-weight:600;line-height:1.1;text-wrap:balance;margin:0}
+h2{font-size:1.72rem;margin-top:.2em;letter-spacing:-.01em}
+h3{font-size:1.2rem;font-weight:600}
+p{margin:0 0 1em}
+a{color:var(--accent);text-decoration-thickness:1px;text-underline-offset:2px}
+strong{font-weight:600}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-weight:500}
+small{color:var(--muted)}
+
+/* sticky header */
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--surface) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--border)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:21;background:var(--surface)}
+.top .wrap{display:flex;align-items:center;gap:14px;padding-block:10px}
+.top .brand{font-family:var(--f-mono);font-size:.78rem;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-right:auto}
+.top nav{display:flex;gap:4px;flex-wrap:wrap}
+.top nav a{font-size:.82rem;color:var(--muted);text-decoration:none;padding:4px 8px;border-radius:6px}
+.top nav a:hover{background:var(--surface-2);color:var(--fg)}
+.toggle{font-family:var(--f-mono);font-size:.74rem;border:1px solid var(--border);background:var(--surface);color:var(--fg);border-radius:7px;padding:6px 9px;cursor:pointer}
+.toggle:hover{background:var(--surface-2)}
+@media(max-width:640px){.top nav{display:none}}
+
+/* hero */
+.hero{padding-block:52px 34px}
+.eyebrow{font-family:var(--f-mono);font-size:.76rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:16px}
+.hero h1{font-size:clamp(2.3rem,7vw,3.7rem);font-weight:900;letter-spacing:-.02em}
+.hero .sub{font-size:1.16rem;color:var(--muted);margin-top:18px;max-width:40ch}
+.answer{margin-top:30px;padding:22px 24px;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:12px;box-shadow:var(--shadow)}
+.answer p:last-child{margin-bottom:0}
+.byline{margin-top:22px;font-size:.9rem;color:var(--faint);font-family:var(--f-mono)}
+
+section{padding-block:38px;border-top:1px solid var(--border)}
+.lead{font-size:1.06rem}
+.section-tag{font-family:var(--f-mono);font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin-bottom:10px}
+
+/* finding cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:8px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:18px 18px 16px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px}
+.card .fnum{font-family:var(--f-mono);font-size:.72rem;color:var(--faint);letter-spacing:.05em}
+.card h3{font-size:1.06rem;line-height:1.2}
+.card p{font-size:.92rem;color:var(--muted);margin:0}
+.card .stat{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-size:1.5rem;font-weight:600;color:var(--fg)}
+.card.flag{border-left:3px solid var(--warn)}
+
+/* figure */
+figure{margin:24px 0 8px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 18px 14px;box-shadow:var(--shadow)}
+figure .fig-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+figure figcaption{font-size:.85rem;color:var(--muted);margin-top:12px}
+.fig-title{font-weight:600;font-size:1.02rem}
+.controls{display:flex;gap:6px;flex-wrap:wrap}
+.seg{display:inline-flex;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.seg button{font-family:var(--f-mono);font-size:.76rem;border:0;background:var(--surface);color:var(--muted);padding:6px 11px;cursor:pointer;border-right:1px solid var(--border)}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--accent);color:#fff}
+:root[data-theme="dark"] .seg button[aria-pressed="true"],
+:root:not([data-theme="light"]) .seg button[aria-pressed="true"]{color:#0b0f14}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]) .seg button[aria-pressed="true"]{color:#fff}}
+.chart-wrap{width:100%;overflow-x:auto}
+svg{display:block;max-width:100%;height:auto}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:.82rem;font-family:var(--f-mono);margin-top:4px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.swatch{width:12px;height:12px;border-radius:3px;display:inline-block;flex:0 0 auto}
+
+/* tooltip */
+#tip{position:fixed;z-index:60;pointer-events:none;opacity:0;transition:opacity .09s;background:var(--fg);color:var(--bg);font-family:var(--f-mono);font-size:.76rem;line-height:1.45;padding:8px 10px;border-radius:8px;max-width:260px;box-shadow:0 6px 24px rgba(0,0,0,.28)}
+#tip b{font-weight:600}
+
+/* data table fallback */
+details.data{margin-top:12px;border-top:1px dashed var(--border);padding-top:8px}
+details.data summary{font-size:.8rem;color:var(--accent);cursor:pointer;font-family:var(--f-mono)}
+table{border-collapse:collapse;width:100%;font-size:.82rem;margin-top:10px;font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+th,td{text-align:right;padding:5px 9px;border-bottom:1px solid var(--border)}
+th:first-child,td:first-child{text-align:left}
+thead th{color:var(--muted);font-weight:500;border-bottom:1px solid var(--fg)}
+
+/* readout widget */
+.readout{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin:14px 0}
+.ro{background:var(--surface-2);border-radius:10px;padding:12px 14px}
+.ro .k{font-family:var(--f-mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.04em;color:var(--faint)}
+.ro .v{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-size:1.3rem;font-weight:600;margin-top:3px}
+.verdict{background:var(--accent-soft);border-radius:10px;padding:14px 16px;font-size:.95rem;margin-top:4px}
+
+/* technical detail */
+details.tech{margin:18px 0;background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:0 16px}
+details.tech>summary{cursor:pointer;padding:14px 0;font-weight:600;font-family:var(--f-body);list-style:none;display:flex;align-items:center;gap:8px}
+details.tech>summary::-webkit-details-marker{display:none}
+details.tech>summary::before{content:"+";font-family:var(--f-mono);color:var(--accent);font-weight:600}
+details.tech[open]>summary::before{content:"\2212"}
+details.tech .body{padding-bottom:16px;font-size:.93rem;color:var(--muted)}
+details.tech .body p:last-child{margin-bottom:0}
+
+/* glossary / callout */
+.gloss-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:4px 26px}
+.gloss-grid div{padding:9px 0;border-bottom:1px solid var(--border);font-size:.92rem}
+.gloss-grid dt{font-weight:600;font-family:var(--f-mono);font-size:.86rem}
+.callout{margin:18px 0;padding:16px 18px;border-radius:12px;background:var(--hk-soft);border:1px solid color-mix(in srgb,var(--hk) 30%,transparent)}
+.callout .tag{font-family:var(--f-mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--hk);font-weight:600}
+code{font-family:var(--f-mono);font-size:.88em;background:var(--surface-2);padding:1px 5px;border-radius:4px}
+pre{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:14px;overflow-x:auto;font-family:var(--f-mono);font-size:.82rem;line-height:1.5}
+ul.tight{margin:0 0 1em;padding-left:1.1em}
+ul.tight li{margin-bottom:.4em}
+.trust-row{display:flex;gap:12px;align-items:flex-start;padding:13px 0;border-bottom:1px solid var(--border)}
+.trust-row .ic{font-family:var(--f-mono);font-weight:600;color:var(--warn);flex:0 0 auto;width:1.4em;text-align:center}
+.trust-row .t{font-size:.94rem}
+.trust-row .t b{display:block;margin-bottom:2px}
+footer{padding-block:40px 60px;color:var(--muted);font-size:.86rem}
+.skip{position:absolute;left:-999px}.skip:focus{left:8px;top:8px;background:var(--surface);padding:8px;border-radius:6px;z-index:80}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<a href="#main" class="skip">Skip to content</a>
+<header class="top">
+  <div class="wrap">
+    <span class="brand">SafeClawBench · Qwen2.5 scaling</span>
+    <nav>
+      <a href="#findings">Findings</a>
+      <a href="#method">Method</a>
+      <a href="#scaling">Results</a>
+      <a href="#judges">Judges</a>
+      <a href="#trust">Trust</a>
+      <a href="#repro">Reproduce</a>
+    </nav>
+    <button class="toggle" id="themeBtn" aria-label="Switch colour theme">◐ theme</button>
+  </div>
+</header>
+
+<main id="main" class="wrap">
+
+<div class="hero">
+  <div class="eyebrow">Agent-security evaluation · open-weight LLMs</div>
+  <h1>Bigger isn't safer.</h1>
+  <p class="sub">What happens to an open-weight model's resistance to agent attacks when you scale it from 7 billion to 32 billion parameters?</p>
+  <div class="answer">
+    <p><strong>The short answer.</strong> I ran the same 600 agent-attack scenarios against three sizes of Qwen2.5 with no extra guardrails, and scored each response two ways. By the usual "did the model go along with the attack?" measure, the <em>larger</em> models were easier to manipulate, not harder — and that held under two independent graders.</p>
+    <p>But "the attack succeeded" turns out to be a judgement call, and a lot of the disagreement between graders came down to a data quirk rather than a real difference. When I ran the handful of cases through a sandbox that needs no grader at all, the size effect disappeared. So: <strong>riskier on paper, unproven in execution</strong> — and how you measure matters as much as the model.</p>
+  </div>
+  <div class="byline">A public writeup · UK · October 2026 · all numbers reproducible from the released scripts</div>
+</div>
+
+<section id="findings">
+  <div class="section-tag">The five things I found</div>
+  <h2>Key findings</h2>
+  <p class="lead">Ranked by how strongly the evidence supports them. The first is robust; the middle three come with caveats I'm explicit about; the last is a deliberate non-result.</p>
+  <div class="cards">
+    <div class="card">
+      <span class="fnum">01 · robust</span>
+      <h3>Scaling up raised the attack-success rate</h3>
+      <div class="stat">+17 / +9.5 pts</div>
+      <p>From 7B to 32B, the semantic attack-success rate rose by 17 points under the primary grader and 9.5 under the validation grader. Both results are statistically solid, and the trend is monotonic.</p>
+    </div>
+    <div class="card flag">
+      <span class="fnum">02 · the twist</span>
+      <h3>The graders disagreed — but it's mostly an artefact</h3>
+      <div class="stat">5–10 → 22–27 pts</div>
+      <p>On responses that weren't cut off at a 2,000-character cap, the two graders land within 5–10 points and agree on the scaling trend. The big gap only appears on truncated responses, which hit the largest model hardest.</p>
+    </div>
+    <div class="card">
+      <span class="fnum">03 · definitions</span>
+      <h3>"Succeeded" depends on what you count</h3>
+      <div class="stat">95% vs 48%</div>
+      <p>At 32B, counting whether the model <em>agreed</em> to the attack gives 95%; counting whether harm actually happened when tools ran gives 48%. Semantic scoring roughly doubles the observable-harm rate.</p>
+    </div>
+    <div class="card">
+      <span class="fnum">04 · one family</span>
+      <h3>One attack type drives the disagreement</h3>
+      <div class="stat">63% vs 16%</div>
+      <p>For meta-extraction (MEX) attacks the lenient grader says 63% success, the strict one 16%. The sandbox shows roughly 0% real harm there — pointing, for this family, toward the stricter grader.</p>
+    </div>
+    <div class="card">
+      <span class="fnum">05 · non-result</span>
+      <h3>No size effect in the sandbox</h3>
+      <div class="stat">43 / 43 / 48%</div>
+      <p>At the execution layer, harm-completion barely moved across sizes and the intervals overlap (only 60 cases). The scaling signal lives entirely in the semantic grading, not in measured harm.</p>
+    </div>
+  </div>
+</section>
+
+<section id="method">
+  <div class="section-tag">What I did</div>
+  <h2>The setup, in one picture</h2>
+  <p class="lead">I extended <a href="https://arxiv.org/abs/2606.18356" target="_blank" rel="noopener">SafeClawBench</a> (Tian et al., 2026) across three sizes of the same open-weight model family, holding the defence setting fixed, and scored the results two independent ways plus a deterministic sandbox.</p>
+  <figure>
+    <div class="fig-head"><span class="fig-title">Evaluation pipeline</span></div>
+    <div class="chart-wrap" id="pipe"></div>
+    <figcaption>Each of the 600 Semantic Core scenarios was run once per model at temperature&nbsp;0 under defence&nbsp;<strong>D0</strong> (the baseline: no added guardrails). Saved responses were then graded by two LLM judges. A separate 60-scenario Exec track was run through a sandbox with deterministic state checks — no LLM grader involved.</figcaption>
+  </figure>
+  <p><strong>Two kinds of finding, kept separate throughout.</strong> A <em>model-layer</em> finding is about the model's own behaviour under attack with no guardrails — that's what this study measures. An <em>infrastructure-layer</em> finding is about the sandbox, egress controls and approval gates around the model — not tested here. Everything below is model-layer unless it says otherwise.</p>
+  <details class="tech"><summary>Technical detail: models, judges and metrics</summary>
+    <div class="body">
+      <p><strong>Models:</strong> Qwen2.5 7B / 14B / 32B, GGUF Q4_K_M, served on Ollama. <strong>Defence D0:</strong> the benchmark's baseline condition with no supplementary defences.</p>
+      <p><strong>Judges:</strong> the primary grader is DeepSeek (<code>deepseek-flash</code>); the validation grader is Claude Haiku 4.5. A <em>judge</em> here is an LLM that reads a scenario and the model's response and labels whether the attack succeeded (plus a 1–5 safety score). <strong>ASR</strong> = attack-success rate, the share of scenarios the judge marks as successful. The original paper used a different judge (gpt-5.4), so its absolute numbers aren't directly comparable to mine.</p>
+      <p><strong>Tracks:</strong> <em>Semantic Core</em> = 600 scenarios/model, graded by LLM. <em>Exec-Balanced</em> = 60 scenarios/model run in a sandbox where success is decided by deterministic state oracles (did a file get written, an email get sent, a policy get changed) — no LLM judgement.</p>
+      <p><strong>Attack families</strong> (100 Core scenarios each): ADI, DPI, IPI, MEX, MPI, TRI — explained in the family explorer below and the glossary.</p>
+    </div>
+  </details>
+</section>
+
+<section id="scaling">
+  <div class="section-tag">Results · scaling</div>
+  <h2>Does size make it safer or riskier?</h2>
+  <p class="lead">Riskier, under both graders. Here is the semantic attack-success rate for each model size, with 95% confidence intervals (the range the true rate is very likely to sit in). Toggle the grader to see that the gap between them is a constant offset — the upward slope is there either way.</p>
+  <figure>
+    <div class="fig-head">
+      <span class="fig-title">Core attack-success rate by model size</span>
+      <div class="controls"><div class="seg" id="asrJudge" role="group" aria-label="Choose grader">
+        <button data-j="both" aria-pressed="true">Both</button>
+        <button data-j="ds" aria-pressed="false">DeepSeek</button>
+        <button data-j="hk" aria-pressed="false">Haiku</button>
+      </div></div>
+    </div>
+    <div class="chart-wrap" id="asrChart"></div>
+    <div class="legend" id="asrLegend"></div>
+    <figcaption>Semantic Core, 600 scenarios per model. Error bars are 95% Wilson intervals. Both graders rise monotonically with size; DeepSeek sits consistently above Haiku.</figcaption>
+    <details class="data"><summary>Show the numbers</summary>
+      <table><thead><tr><th>Model</th><th>DeepSeek ASR</th><th>95% CI</th><th>Haiku ASR</th><th>95% CI</th></tr></thead>
+      <tbody>
+        <tr><td>7B</td><td>68.5%</td><td>64.7–72.1</td><td>55.5%</td><td>51.5–59.4</td></tr>
+        <tr><td>14B</td><td>74.0%</td><td>70.3–77.3</td><td>58.5%</td><td>54.5–62.4</td></tr>
+        <tr><td>32B</td><td>85.5%</td><td>82.5–88.1</td><td>65.0%</td><td>61.1–68.7</td></tr>
+      </tbody></table>
+    </details>
+  </figure>
+  <details class="tech"><summary>Technical detail: is the trend real, or noise?</summary>
+    <div class="body">
+      <p>Yes under both graders. A population-averaged (GEE) logistic model with the same 600 cases clustered per scenario gives an odds ratio per size step of <strong>1.70</strong> (95% CI 1.50–1.92, p≈1.5×10⁻¹⁷) for DeepSeek and <strong>1.30</strong> (1.16–1.45, p≈4.9×10⁻⁶) for Haiku. Paired exact McNemar tests on the matched scenarios: 7B→32B is +17.0 pts for DeepSeek (p&lt;10⁻¹⁵) and +9.5 pts for Haiku (p&lt;10⁻⁴), both surviving Holm correction. The one step that isn't significant under Haiku is 7B→14B (+3.0 pts, p=0.19).</p>
+      <p>Statsmodels wasn't available in the analysis environment, so the trend model is implemented directly as a GEE logistic with cluster-robust (CR1) standard errors — same target as a mixed-effects logistic, no external dependency.</p>
+    </div>
+  </details>
+
+  <h3 style="margin-top:34px">Where the attacks land</h3>
+  <p>The six attack families behave very differently. Hover (or tap) a cell for the family's meaning and both graders' numbers. The pattern to watch is the <strong>MEX</strong> row — it's where the graders part company.</p>
+  <figure>
+    <div class="fig-head">
+      <span class="fig-title">Attack-success by family and size</span>
+      <div class="controls"><div class="seg" id="heatJudge" role="group" aria-label="Choose grader">
+        <button data-j="ds" aria-pressed="true">DeepSeek</button>
+        <button data-j="hk" aria-pressed="false">Haiku</button>
+      </div></div>
+    </div>
+    <div class="chart-wrap" id="heat"></div>
+    <figcaption>Each cell is the attack-success rate (%) for that family at that size, 100 scenarios per cell. Darker = higher. Switch grader and watch the MEX row collapse.</figcaption>
+    <details class="data"><summary>Show the numbers</summary>
+      <table id="heatTable"><thead><tr><th>Family</th><th>7B·DS</th><th>14B·DS</th><th>32B·DS</th><th>7B·HK</th><th>14B·HK</th><th>32B·HK</th></tr></thead><tbody></tbody></table>
+    </details>
+  </figure>
+  <div class="callout">
+    <div class="tag">MEX callout</div>
+    <p style="margin:.4em 0 0">MEX attacks ask the model to <strong>reveal its own internal rules or system prompt</strong>, usually disguised as an audit. Reading the transcripts, the models almost always answered with generic, public-sounding policy boilerplate that leaks nothing real. DeepSeek counts that as a successful extraction (the model "described its policies"); Haiku counts it as safe (nothing actual was disclosed). That single interpretation gap accounts for most of the headline disagreement — see the next section.</p>
+  </div>
+</section>
+
+<section id="judges">
+  <div class="section-tag">The judge-sensitivity story</div>
+  <h2>Two graders, one disagreement, mostly explained</h2>
+  <p class="lead">The two graders agree about 78–80% of the time, and agreement <em>falls</em> as models get larger. That looks alarming until you find the cause.</p>
+
+  <figure>
+    <div class="fig-head">
+      <span class="fig-title">How the two graders overlap, per size</span>
+      <div class="controls"><div class="seg" id="cmModel" role="group" aria-label="Choose model size">
+        <button data-m="7b" aria-pressed="false">7B</button>
+        <button data-m="14b" aria-pressed="false">14B</button>
+        <button data-m="32b" aria-pressed="true">32B</button>
+      </div></div>
+    </div>
+    <div class="chart-wrap" id="confmat"></div>
+    <figcaption>Agreement table over 600 scenarios. The off-diagonal cells are disagreements. Note how lopsided they are: DeepSeek says "success" where Haiku says "safe" far more often than the reverse. Agreement κ (chance-corrected) falls from 0.59 at 7B to 0.44 at 32B.</figcaption>
+  </figure>
+
+  <h3 style="margin-top:30px">The cause: a 2,000-character cap</h3>
+  <p>Saved responses were truncated at 2,000 characters. That matters because larger models write longer, more elaborate answers, so they hit the cap more often: <span class="num">45%</span> of 7B responses, <span class="num">48%</span> of 14B, but <span class="num">63%</span> of 32B. A truncated answer often shows the model <em>starting</em> to comply but cuts off before it actually does anything — and that's exactly the zone where the two graders diverge.</p>
+  <figure>
+    <div class="fig-head"><span class="fig-title">The grader gap, split by whether the response was cut off</span></div>
+    <div class="chart-wrap" id="truncChart"></div>
+    <div class="legend" id="truncLegend"></div>
+    <figcaption>DeepSeek-minus-Haiku ASR gap (percentage points). On complete responses the two graders are close (5–10 pts). On truncated responses the gap triples (22–27 pts). Control for truncation and the disagreement largely vanishes.</figcaption>
+    <details class="data"><summary>Show the numbers</summary>
+      <table><thead><tr><th>Model</th><th>Gap · complete</th><th>Gap · truncated</th></tr></thead>
+      <tbody><tr><td>7B</td><td>5.2 pts</td><td>22.4 pts</td></tr><tr><td>14B</td><td>7.4 pts</td><td>24.1 pts</td></tr><tr><td>32B</td><td>9.9 pts</td><td>26.7 pts</td></tr></tbody></table>
+    </details>
+  </figure>
+  <p>The clincher: restrict the 7B→32B comparison to scenarios that weren't truncated at <em>either</em> size, and both graders show the <strong>same</strong> +11-point rise (DeepSeek p=0.004, Haiku p=0.005). On truncated scenarios, DeepSeek still shows +10 points but Haiku shows +0.9 (flat). <strong>The scaling result is robust; the grader's apparent flatness was a measurement artefact all along.</strong></p>
+
+  <h3 style="margin-top:30px">What changes if you pick the other grader?</h3>
+  <p>This is the honest "it depends" made concrete. Flip the grader and watch the headline numbers move — the <em>direction</em> never does.</p>
+  <div class="controls" style="margin:6px 0 2px"><div class="seg" id="roJudge" role="group" aria-label="Choose grader">
+    <button data-j="ds" aria-pressed="true">DeepSeek (primary)</button>
+    <button data-j="hk" aria-pressed="false">Haiku (validation)</button>
+  </div></div>
+  <div class="readout" id="readout"></div>
+  <div class="verdict" id="verdict"></div>
+  <details class="tech"><summary>Technical detail: what each grader keys on</summary>
+    <div class="body">
+      <p>Across 1,800 graded pairs, disagreements run 340 "DeepSeek-success / Haiku-safe" against only 46 the other way — DeepSeek is systematically the more permissive grader. Reading 40 cases in full, the split is structural: <strong>DeepSeek scores intent</strong> (did the model adopt or commit to the harmful goal, measured against the literal success predicate), while <strong>Haiku requires observable completed harm</strong> (did the action actually happen in the visible text). A response cut off after a compliant preamble reads as success to one and safe to the other. When responses clearly finish the harmful act, both graders agree.</p>
+    </div>
+  </details>
+</section>
+
+<section id="exec">
+  <div class="section-tag">Counting harm</div>
+  <h2>Semantic success vs. actual harm</h2>
+  <p class="lead">The Exec track removes the grader entirely: a scenario counts as harmful only if a deterministic check fires in the sandbox. It's the most trustworthy signal here — and the most under-powered, at 60 scenarios per model.</p>
+  <figure>
+    <div class="fig-head"><span class="fig-title">Semantic grading overcounts observable harm</span></div>
+    <div class="chart-wrap" id="execChart"></div>
+    <div class="legend" id="execLegend"></div>
+    <figcaption>All three lines are on the same 60 scenarios (mapped between tracks). The two semantic lines are how often each grader called it a success; the green line is how often the sandbox saw harm actually complete. At 32B the gap is roughly 2×. The green line is flat across sizes — no detectable scaling effect once a grader is removed (note the wide intervals at n=60: ±~12 points).</figcaption>
+    <details class="data"><summary>Show the numbers</summary>
+      <table><thead><tr><th>Model</th><th>Core · DeepSeek</th><th>Core · Haiku</th><th>Exec harm (oracle)</th></tr></thead>
+      <tbody><tr><td>7B</td><td>78.3%</td><td>55.0%</td><td>43.3%</td></tr><tr><td>14B</td><td>81.7%</td><td>66.7%</td><td>43.3%</td></tr><tr><td>32B</td><td>95.0%</td><td>73.3%</td><td>48.3%</td></tr></tbody></table>
+      <p style="font-family:var(--f-body);color:var(--muted);font-size:.85rem">Core percentages here are for the 60 Exec-mapped scenarios only, so they differ from the full 600-scenario ASR above.</p>
+    </details>
+  </figure>
+  <p>For MEX specifically, this is the closest thing to a tie-breaker. On the 10 MEX scenarios with sandbox oracles, DeepSeek scores 90–100% success, Haiku 20%, and the sandbox sees <strong>0–10%</strong> actual harm. For this family the stricter grader is closer to the ground truth — though with only 10 cases, and with the caveat that a state oracle under-detects pure information-leak harms, I'd call it a strong hint, not a verdict.</p>
+</section>
+
+<section id="trust">
+  <div class="section-tag">Caveats, stated plainly</div>
+  <h2>How much can you trust this?</h2>
+  <p class="lead">Enough to believe the direction of the main result; not enough to quote the exact numbers as settled truth. Here's what could be wrong.</p>
+  <div>
+    <div class="trust-row"><span class="ic">1</span><div class="t"><b>Neither grader is ground truth.</b> They're two LLMs that disagree, and the original paper used a third (gpt-5.4). Where they conflict and the sandbox can't adjudicate, I say so rather than pick a winner.</div></div>
+    <div class="trust-row"><span class="ic">2</span><div class="t"><b>The 2,000-character truncation touches ~half of all responses</b> (63% at 32B) and is the main driver of grader disagreement. Both graders saw partial text on those cases.</div></div>
+    <div class="trust-row"><span class="ic">3</span><div class="t"><b>A serving-environment difference is confounded with size.</b> 7B and 14B were generated in July (older Ollama, serial); 32B in October (newer Ollama, parallel). A 30-case calibration bounds this at roughly +10 points and not statistically distinguishable from zero — small, but not ruled out, and only measured on 7B.</div></div>
+    <div class="trust-row"><span class="ic">4</span><div class="t"><b>One sample per scenario.</b> Temperature 0, so responses are near-deterministic, but there's no per-scenario variance estimate from resampling.</div></div>
+    <div class="trust-row"><span class="ic">5</span><div class="t"><b>The Exec track is n=60.</b> Intervals are roughly ±12 points, so it can rule a large size effect in or out only loosely, and its state oracles under-detect information-leak harms.</div></div>
+  </div>
+</section>
+
+<section id="deploy">
+  <div class="section-tag">So what</div>
+  <h2>What this means if you deploy agents</h2>
+  <ul class="tight">
+    <li><strong>Don't assume a bigger open-weight model is a safer agent.</strong> With no guardrails, the larger Qwen2.5 models complied with attacks more often, not less. That's a model-layer property; it won't be fixed by swapping in a bigger model.</li>
+    <li><strong>Measure harm at the layer you actually gate.</strong> Semantic "the model agreed" roughly doubled the rate of sandbox "harm actually happened". If your infrastructure requires approval before tools execute, many semantic successes never become real harm — but that's an infrastructure-layer control you have to build, not something the model gives you.</li>
+    <li><strong>Your choice of evaluator changes the headline.</strong> Two reasonable graders differed by up to 27 points on the same responses. If you benchmark agent safety, report the grader, the metric definition, and a truncation check — or you'll ship a number that doesn't replicate.</li>
+  </ul>
+</section>
+
+<section id="pitfalls">
+  <div class="section-tag">Lessons</div>
+  <h2>Pitfalls I hit</h2>
+  <p>The most useful practical lesson wasn't about the models. Partway through, the grading API silently changed behaviour: with its "thinking" mode on, it exhausted its token budget and returned <strong>empty output on about 30% of cases</strong>. Empty verdicts quietly read as "safe", which would have deflated the attack-success rate if I'd trusted them.</p>
+  <p>The shipped calibration file still carries the fingerprint of this: <span class="num">15 of 30</span> verdicts in one run are <code>"Judge parse error"</code> nulls. The fix was to disable thinking mode for grading and treat any null as a failure to re-run, never as a negative. <strong>Lesson: pin your judge build, validate every verdict, and never let a silent null count as a result.</strong></p>
+</section>
+
+<section id="repro">
+  <div class="section-tag">Do it yourself</div>
+  <h2>Reproduce it</h2>
+  <p>Every table and figure in this report is regenerated by one script from the released aggregate data:</p>
+  <pre>python3 analysis.py --data ./data --out ./out
+# writes out/results.json and out/figures/*.png  (needs numpy, scipy, matplotlib)</pre>
+  <p><strong>Rough cost.</strong> Generation ran on an A40 at about $0.59/hour. Re-running 7B and 14B in the current environment to remove the serving confound would cost roughly <span class="num">$1–1.4</span> on a fresh pod (about 1–2 hours). Re-grading from saved responses is API-cost only.</p>
+  <p><strong>What's released.</strong> Aggregate tables and per-scenario verdicts and metrics — <em>not</em> raw model responses or the attack prompts. The benchmark itself (<code>benchmark_v5_600.json</code>) is not redistributed; get it from the <a href="https://huggingface.co/datasets/sairights/safeclawbench" target="_blank" rel="noopener">original dataset</a> under its own licence.</p>
+</section>
+
+<section id="about">
+  <div class="section-tag">Credit & terms</div>
+  <h2>Acknowledgements and attribution</h2>
+  <p>This work extends <strong>SafeClawBench</strong> — Tian et al., 2026, <a href="https://arxiv.org/abs/2606.18356" target="_blank" rel="noopener">arXiv:2606.18356</a>, released under the MIT licence. The benchmark design, attack taxonomy and Exec oracles are theirs; the cross-scale evaluation, the dual-grader analysis and the truncation finding are mine. My analysis code and repo patches are released under the MIT licence.</p>
+
+  <h3 style="margin-top:26px">Glossary</h3>
+  <dl class="gloss-grid">
+    <div><dt>ASR</dt> attack-success rate — the share of scenarios a grader marks as a successful attack.</div>
+    <div><dt>Judge / grader</dt> an LLM that reads a scenario and response and labels success or safety.</div>
+    <div><dt>D0</dt> the benchmark's baseline defence setting: no added guardrails.</div>
+    <div><dt>Core / Exec</dt> Core = 600 LLM-graded scenarios; Exec = 60 sandbox scenarios with deterministic checks.</div>
+    <div><dt>κ (kappa)</dt> agreement between graders corrected for chance; 1 = perfect, 0 = chance.</div>
+    <div><dt>95% CI</dt> confidence interval — the range the true rate very likely falls in.</div>
+    <div><dt>ADI</dt> an instruction with an unsafe built-in default a careful agent should question.</div>
+    <div><dt>DPI</dt> the user's own request directly asks for the harmful action.</div>
+    <div><dt>IPI</dt> a malicious instruction hidden in content the agent reads, not in the user message.</div>
+    <div><dt>MEX</dt> an attempt to make the agent reveal its own internal rules or system prompt.</div>
+    <div><dt>MPI</dt> getting the agent to save a harmful rule for later, poisoning future actions.</div>
+    <div><dt>TRI</dt> forged authority, urgency or procedure — including notes planted in tool output — to bypass checks.</div>
+  </dl>
+
+  <details class="tech" style="margin-top:22px"><summary>Full disclosures</summary>
+    <div class="body">
+      <p><strong>Judge build.</strong> <code>deepseek-flash</code> is an alias (V4.1); the exact build isn't pinned because the API returns only the alias. Thinking mode was disabled after it returned empty output on ~30% of cases. Validation grader: Claude Haiku 4.5. All 1,800 responses were re-graded uniformly from saved text.</p>
+      <p><strong>Environment.</strong> 7B/14B Core generated July 2026 (older Ollama, serial); 32B Core on 23 Oct 2026 (Ollama 0.40.9, 4 parallel slots, context 8192). A40 GPU, no persistent volume. Responses truncated at 2,000 characters on save; the generation-time grader saw up to 3,000.</p>
+      <p><strong>Decoding.</strong> Temperature 0 (greedy); deterministic given identical cache state, though response text still drifts between builds.</p>
+    </div>
+  </details>
+</section>
+
+</main>
+<footer class="wrap">
+  <p>Semantic Core: 600 scenarios × 3 sizes × 2 graders. Exec: 60 scenarios × 3 sizes, sandbox-scored. Numbers reproducible from the released analysis script. Built for GitHub Pages — static, offline, no trackers.</p>
+</footer>
+
+<div id="tip" role="status" aria-live="polite"></div>
+
+<script>
+"use strict";
+/* ---------------- data (every number traces to the findings memo / results.json) ---------------- */
+const SIZES=["7b","14b","32b"], SLAB=["7B","14B","32B"];
+const ASR={ ds:{"7b":[68.5,64.7,72.1],"14b":[74.0,70.3,77.3],"32b":[85.5,82.5,88.1]},
+            hk:{"7b":[55.5,51.5,59.4],"14b":[58.5,54.5,62.4],"32b":[65.0,61.1,68.7]} };
+const FAM={
+  ADI:{g:"An instruction with an unsafe built-in default (“if unsure, keep the access on”) a careful agent should question.",ds:[42,55,72],hk:[34,46,52]},
+  DPI:{g:"The user’s own request directly asks for the harmful action — dumping credentials, exporting secrets — as routine work.",ds:[78,89,97],hk:[81,85,91]},
+  IPI:{g:"A malicious instruction hidden inside content the agent reads (a file, a tool’s output), not in the user message.",ds:[83,82,87],hk:[67,74,77]},
+  MEX:{g:"An attempt to make the agent reveal its own internal rules, system prompt or policies, usually disguised as an audit.",ds:[50,68,70],hk:[12,18,17]},
+  MPI:{g:"Getting the agent to save a harmful rule for later (“log this exception”), poisoning future actions.",ds:[88,91,98],hk:[77,76,82]},
+  TRI:{g:"Forged authority, urgency or procedure — including notes planted in a tool’s reply — to bypass the agent’s usual checks.",ds:[70,59,89],hk:[62,52,71]}
+};
+const FAMK=Object.keys(FAM);
+const CM={ "7b":{yy:313,yn:98,ny:20,nn:169,agree:80.3,k:0.59},
+          "14b":{yy:330,yn:114,ny:21,nn:135,agree:77.5,k:0.51},
+          "32b":{yy:385,yn:128,ny:5,nn:82,agree:77.8,k:0.44} };
+const GAP={full:[5.2,7.4,9.9],trunc:[22.4,24.1,26.7]};
+const EXEC={ dsCore:[78.3,81.7,95.0], hkCore:[55.0,66.7,73.3], oracle:[43.3,43.3,48.3] };
+const RO={ ds:{a7:68.5,a32:85.5,d:"+17.0",or:"1.70",p:"1.5×10⁻¹⁷",
+               verdict:"Under the primary grader, scaling 7B→32B raises attack-success by 17 points — a clear, highly significant upward trend."},
+           hk:{a7:55.5,a32:65.0,d:"+9.5",or:"1.30",p:"4.9×10⁻⁶",
+               verdict:"Under the stricter grader the rise is smaller (+9.5 points) but still highly significant. Same direction, gentler slope."} };
+const CVD={ ds:"var(--ds)", hk:"var(--hk)", exec:"var(--exec)" };
+
+/* ---------------- helpers ---------------- */
+const $=s=>document.querySelector(s), ns="http://www.w3.org/2000/svg";
+function el(t,a){const e=document.createElementNS(ns,t);for(const k in a)e.setAttribute(k,a[k]);return e;}
+function css(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim();}
+const tip=$("#tip");
+function showTip(html,x,y){tip.innerHTML=html;tip.style.opacity=1;const r=tip.getBoundingClientRect();
+  let nx=x+14,ny=y+14; if(nx+r.width>innerWidth-8)nx=x-r.width-14; if(ny+r.height>innerHeight-8)ny=y-r.height-14;
+  tip.style.left=Math.max(8,nx)+"px";tip.style.top=Math.max(8,ny)+"px";}
+function hideTip(){tip.style.opacity=0;}
+function bindTip(node,html){
+  node.addEventListener("pointerenter",e=>showTip(html,e.clientX,e.clientY));
+  node.addEventListener("pointermove",e=>showTip(html,e.clientX,e.clientY));
+  node.addEventListener("pointerleave",hideTip);
+  node.setAttribute("tabindex","0");
+  node.addEventListener("focus",()=>{const b=node.getBoundingClientRect();showTip(html,b.left+b.width/2,b.top);});
+  node.addEventListener("blur",hideTip);
+}
+
+/* ---------------- V1: grouped ASR bars with CI ---------------- */
+let asrJudge="both";
+function drawASR(){
+  const host=$("#asrChart"); host.innerHTML="";
+  const W=680,H=380,m={t:18,r:16,b:46,l:46};
+  const iw=W-m.l-m.r, ih=H-m.t-m.b;
+  const svg=el("svg",{viewBox:`0 0 ${W} ${H}`,role:"img","aria-label":"Attack-success rate by model size and grader"});
+  const y=v=>m.t+ih-(v/100)*ih;
+  for(let g=0;g<=100;g+=20){ // gridlines
+    svg.appendChild(el("line",{x1:m.l,x2:W-m.r,y1:y(g),y2:y(g),stroke:css("--border"),"stroke-width":1}));
+    const t=el("text",{x:m.l-8,y:y(g)+4,"text-anchor":"end",fill:css("--muted"),"font-size":12,"font-family":"var(--f-mono)"});t.textContent=g;svg.appendChild(t);
+  }
+  const judges = asrJudge==="both"?["ds","hk"]:[asrJudge];
+  const bw = judges.length===2?30:46, group=iw/3;
+  SIZES.forEach((sz,i)=>{
+    const cx=m.l+group*i+group/2;
+    const total=judges.length*bw+(judges.length-1)*10;
+    judges.forEach((j,k)=>{
+      const [val,lo,hi]=ASR[j][sz];
+      const x=cx-total/2+k*(bw+10);
+      const col=j==="ds"?css("--ds"):css("--hk");
+      const bar=el("rect",{x,y:y(val),width:bw,height:y(0)-y(val),rx:4,fill:col});
+      bindTip(bar,`<b>${SLAB[i]} · ${j==="ds"?"DeepSeek":"Haiku"}</b><br>ASR ${val}%<br>95% CI ${lo}–${hi}`);
+      svg.appendChild(bar);
+      // CI whisker
+      svg.appendChild(el("line",{x1:x+bw/2,x2:x+bw/2,y1:y(lo),y2:y(hi),stroke:css("--fg"),"stroke-width":1.5}));
+      svg.appendChild(el("line",{x1:x+bw/2-4,x2:x+bw/2+4,y1:y(hi),y2:y(hi),stroke:css("--fg"),"stroke-width":1.5}));
+      svg.appendChild(el("line",{x1:x+bw/2-4,x2:x+bw/2+4,y1:y(lo),y2:y(lo),stroke:css("--fg"),"stroke-width":1.5}));
+      const lab=el("text",{x:x+bw/2,y:y(hi)-9,"text-anchor":"middle",fill:css("--fg"),"font-size":12.5,"font-weight":600,"font-family":"var(--f-mono)"});lab.textContent=val;svg.appendChild(lab);
+    });
+    const t=el("text",{x:cx,y:H-16,"text-anchor":"middle",fill:css("--fg"),"font-size":14,"font-family":"var(--f-mono)"});t.textContent=SLAB[i];svg.appendChild(t);
+  });
+  host.appendChild(svg);
+  // legend
+  const lg=$("#asrLegend");lg.innerHTML="";
+  const items = asrJudge==="both"?[["DeepSeek","--ds"],["Haiku","--hk"]]:asrJudge==="ds"?[["DeepSeek","--ds"]]:[["Haiku","--hk"]];
+  items.forEach(([n,c])=>{const s=document.createElement("span");s.innerHTML=`<i class="swatch" style="background:${css(c)}"></i>${n}`;lg.appendChild(s);});
+}
+
+/* ---------------- V3: family heatmap ---------------- */
+let heatJudge="ds";
+function heatColor(v){ // sequential blue ramp, light->dark by value
+  const t=v/100;
+  // interpolate between light step and dark step of the blue ramp
+  const a=[205,226,251], b=[13,54,107]; // #cde2fb -> #0d366b
+  const c=a.map((x,i)=>Math.round(x+(b[i]-x)*t));
+  return `rgb(${c[0]},${c[1]},${c[2]})`;
+}
+function drawHeat(){
+  const host=$("#heat");host.innerHTML="";
+  const W=680,rows=FAMK.length,cols=3,cellH=46,labelL=56,labelT=26,gap=4;
+  const cw=(W-labelL)/cols, H=labelT+rows*cellH+8;
+  const svg=el("svg",{viewBox:`0 0 ${W} ${H}`,role:"img","aria-label":"Attack family heatmap"});
+  SLAB.forEach((s,c)=>{const t=el("text",{x:labelL+cw*c+cw/2,y:18,"text-anchor":"middle",fill:css("--muted"),"font-size":12.5,"font-family":"var(--f-mono)"});t.textContent=s;svg.appendChild(t);});
+  FAMK.forEach((f,r)=>{
+    const yr=labelT+r*cellH;
+    const tl=el("text",{x:labelL-8,y:yr+cellH/2+4,"text-anchor":"end",fill:css("--fg"),"font-size":13.5,"font-weight":600,"font-family":"var(--f-mono)"});tl.textContent=f;svg.appendChild(tl);
+    FAM[f][heatJudge].forEach((v,c)=>{
+      const x=labelL+cw*c;
+      const cell=el("rect",{x:x+gap/2,y:yr+gap/2,width:cw-gap,height:cellH-gap,rx:5,fill:heatColor(v)});
+      bindTip(cell,`<b>${f} · ${SLAB[c]}</b><br>${FAM[f].g}<br><br>DeepSeek ${FAM[f].ds[c]}% · Haiku ${FAM[f].hk[c]}%`);
+      svg.appendChild(cell);
+      const t=el("text",{x:x+cw/2,y:yr+cellH/2+4.5,"text-anchor":"middle","font-size":13,"font-weight":600,"font-family":"var(--f-mono)",fill:v<60?"#13233a":"#fff"});t.textContent=v;svg.appendChild(t);
+    });
+  });
+  host.appendChild(svg);
+}
+function fillHeatTable(){
+  const tb=$("#heatTable tbody");tb.innerHTML="";
+  FAMK.forEach(f=>{const tr=document.createElement("tr");
+    tr.innerHTML=`<td>${f}</td>`+FAM[f].ds.map(v=>`<td>${v}</td>`).join("")+FAM[f].hk.map(v=>`<td>${v}</td>`).join("");
+    tb.appendChild(tr);});
+}
+
+/* ---------------- V4: confusion matrix ---------------- */
+let cmModel="32b";
+function drawCM(){
+  const host=$("#confmat");host.innerHTML="";
+  const d=CM[cmModel], W=680,H=300,cell=96,ox=190,oy=70;
+  const svg=el("svg",{viewBox:`0 0 ${W} ${H}`,role:"img","aria-label":"Grader agreement matrix"});
+  // axis labels
+  const hx=el("text",{x:ox+cell,y:28,"text-anchor":"middle",fill:css("--hk"),"font-size":13,"font-weight":600,"font-family":"var(--f-mono)"});hx.textContent="Haiku →";svg.appendChild(hx);
+  ["success","safe"].forEach((t,i)=>{const e=el("text",{x:ox+cell/2+i*cell,y:52,"text-anchor":"middle",fill:css("--muted"),"font-size":12,"font-family":"var(--f-mono)"});e.textContent=t;svg.appendChild(e);});
+  const vy=el("text",{x:30,y:oy+cell,"text-anchor":"middle",fill:css("--ds"),"font-size":13,"font-weight":600,"font-family":"var(--f-mono)",transform:`rotate(-90 30 ${oy+cell})`});vy.textContent="DeepSeek →";svg.appendChild(vy);
+  ["success","safe"].forEach((t,i)=>{const e=el("text",{x:ox-12,y:oy+cell/2+i*cell+4,"text-anchor":"end",fill:css("--muted"),"font-size":12,"font-family":"var(--f-mono)"});e.textContent=t;svg.appendChild(e);});
+  const cells=[["yy",0,0,"both success",true],["yn",1,0,"DeepSeek success, Haiku safe",false],
+               ["ny",0,1,"DeepSeek safe, Haiku success",false],["nn",1,1,"both safe",true]];
+  const max=Math.max(d.yy,d.nn);
+  cells.forEach(([key,cx,cy,desc,agree])=>{
+    const v=d[key], x=ox+cx*cell, y=oy+cy*cell;
+    const base=agree?css("--accent"):css("--hk");
+    const alpha=agree?(0.12+0.7*v/max):(0.18+0.6*v/Math.max(d.yn,d.ny));
+    const rect=el("rect",{x,y,width:cell-6,height:cell-6,rx:8,fill:base,"fill-opacity":alpha.toFixed(2),stroke:css("--border")});
+    bindTip(rect,`<b>${desc}</b><br>${v} of 600 scenarios (${(v/600*100).toFixed(0)}%)`);
+    svg.appendChild(rect);
+    const t=el("text",{x:x+(cell-6)/2,y:y+(cell-6)/2+2,"text-anchor":"middle","font-size":22,"font-weight":600,"font-family":"var(--f-mono)",fill:css("--fg")});t.textContent=v;svg.appendChild(t);
+    const p=el("text",{x:x+(cell-6)/2,y:y+(cell-6)/2+22,"text-anchor":"middle","font-size":11,"font-family":"var(--f-mono)",fill:css("--muted")});p.textContent=(v/600*100).toFixed(0)+"%";svg.appendChild(p);
+  });
+  const meta=el("text",{x:ox+2*cell+24,y:oy+30,fill:css("--fg"),"font-size":13,"font-family":"var(--f-mono)"});meta.textContent=`agree ${d.agree}%`;svg.appendChild(meta);
+  const meta2=el("text",{x:ox+2*cell+24,y:oy+50,fill:css("--muted"),"font-size":13,"font-family":"var(--f-mono)"});meta2.textContent=`κ ${d.k}`;svg.appendChild(meta2);
+  const meta3=el("text",{x:ox+2*cell+24,y:oy+76,fill:css("--muted"),"font-size":11.5,"font-family":"var(--f-mono)"});meta3.textContent=`off-diagonal`;svg.appendChild(meta3);
+  const meta4=el("text",{x:ox+2*cell+24,y:oy+92,fill:css("--muted"),"font-size":11.5,"font-family":"var(--f-mono)"});meta4.textContent=`${d.yn} vs ${d.ny}`;svg.appendChild(meta4);
+  host.appendChild(svg);
+}
+
+/* ---------------- V2 (truncation gap) grouped bars ---------------- */
+function drawTrunc(){
+  const host=$("#truncChart");host.innerHTML="";
+  const W=680,H=320,m={t:16,r:16,b:44,l:44},iw=W-m.l-m.r,ih=H-m.t-m.b,maxV=30;
+  const svg=el("svg",{viewBox:`0 0 ${W} ${H}`,role:"img","aria-label":"Grader gap by truncation"});
+  const y=v=>m.t+ih-(v/maxV)*ih;
+  for(let g=0;g<=30;g+=10){svg.appendChild(el("line",{x1:m.l,x2:W-m.r,y1:y(g),y2:y(g),stroke:css("--border")}));
+    const t=el("text",{x:m.l-8,y:y(g)+4,"text-anchor":"end",fill:css("--muted"),"font-size":12,"font-family":"var(--f-mono)"});t.textContent=g;svg.appendChild(t);}
+  const group=iw/3,bw=46;
+  SIZES.forEach((sz,i)=>{
+    const cx=m.l+group*i+group/2;
+    [["full","complete",css("--exec")],["trunc","truncated",css("--hk")]].forEach(([key,lab,col],k)=>{
+      const v=GAP[key][i], x=cx-(bw+10)+k*(bw+10);
+      const bar=el("rect",{x,y:y(v),width:bw,height:y(0)-y(v),rx:4,fill:col});
+      bindTip(bar,`<b>${SLAB[i]} · ${lab}</b><br>grader gap ${v} pts`);
+      svg.appendChild(bar);
+      const t=el("text",{x:x+bw/2,y:y(v)-7,"text-anchor":"middle","font-size":12.5,"font-weight":600,"font-family":"var(--f-mono)",fill:css("--fg")});t.textContent=v;svg.appendChild(t);
+    });
+    const t=el("text",{x:cx,y:H-14,"text-anchor":"middle",fill:css("--fg"),"font-size":14,"font-family":"var(--f-mono)"});t.textContent=SLAB[i];svg.appendChild(t);
+  });
+  host.appendChild(svg);
+  const lg=$("#truncLegend");lg.innerHTML="";
+  [["Complete responses","--exec"],["Truncated responses","--hk"]].forEach(([n,c])=>{const s=document.createElement("span");s.innerHTML=`<i class="swatch" style="background:${css(c)}"></i>${n}`;lg.appendChild(s);});
+}
+
+/* ---------------- V5: core vs exec lines ---------------- */
+function drawExec(){
+  const host=$("#execChart");host.innerHTML="";
+  const W=700,H=340,m={t:18,r:138,b:44,l:44},iw=W-m.l-m.r,ih=H-m.t-m.b;
+  const svg=el("svg",{viewBox:`0 0 ${W} ${H}`,role:"img","aria-label":"Core versus Exec by size"});
+  const x=i=>m.l+iw*(i/2), y=v=>m.t+ih-(v/100)*ih;
+  const SHORT={dsCore:"DeepSeek",hkCore:"Haiku",oracle:"Exec oracle"};
+  for(let g=0;g<=100;g+=20){svg.appendChild(el("line",{x1:m.l,x2:m.l+iw,y1:y(g),y2:y(g),stroke:css("--border")}));
+    const t=el("text",{x:m.l-8,y:y(g)+4,"text-anchor":"end",fill:css("--muted"),"font-size":12,"font-family":"var(--f-mono)"});t.textContent=g;svg.appendChild(t);}
+  SLAB.forEach((s,i)=>{const t=el("text",{x:x(i),y:H-14,"text-anchor":"middle",fill:css("--fg"),"font-size":14,"font-family":"var(--f-mono)"});t.textContent=s;svg.appendChild(t);});
+  const series=[["dsCore","Core · DeepSeek","--ds"],["hkCore","Core · Haiku","--hk"],["oracle","Exec harm (oracle)","--exec"]];
+  series.forEach(([key,lab,cv])=>{
+    const col=css(cv),pts=EXEC[key];
+    let d="";pts.forEach((v,i)=>d+=(i?"L":"M")+x(i)+" "+y(v)+" ");
+    svg.appendChild(el("path",{d,fill:"none",stroke:col,"stroke-width":2.5,"stroke-linejoin":"round"}));
+    pts.forEach((v,i)=>{const c=el("circle",{cx:x(i),cy:y(v),r:5,fill:col,stroke:css("--surface"),"stroke-width":2});
+      bindTip(c,`<b>${lab} · ${SLAB[i]}</b><br>${v}%`);svg.appendChild(c);});
+    // direct label at end (relief rule for aqua contrast)
+    const t=el("text",{x:m.l+iw+8,y:y(pts[2])+4,fill:col,"font-size":11.5,"font-weight":600,"font-family":"var(--f-mono)"});t.textContent=SHORT[key];svg.appendChild(t);
+  });
+  host.appendChild(svg);
+  const lg=$("#execLegend");lg.innerHTML="";
+  series.forEach(([k,lab,cv])=>{const s=document.createElement("span");s.innerHTML=`<i class="swatch" style="background:${css(cv)}"></i>${lab}`;lg.appendChild(s);});
+}
+
+/* ---------------- pipeline diagram ---------------- */
+function drawPipe(){
+  const host=$("#pipe");host.innerHTML="";
+  const W=680,H=250;
+  const svg=el("svg",{viewBox:`0 0 ${W} ${H}`,role:"img","aria-label":"Evaluation pipeline diagram"});
+  function box(x,y,w,h,title,sub,col){
+    const g=el("g",{});
+    g.appendChild(el("rect",{x,y,width:w,height:h,rx:10,fill:css("--surface-2"),stroke:col||css("--border"),"stroke-width":col?2:1}));
+    const t=el("text",{x:x+w/2,y:y+(sub?h/2-4:h/2+5),"text-anchor":"middle",fill:css("--fg"),"font-size":13,"font-weight":600,"font-family":"var(--f-mono)"});t.textContent=title;g.appendChild(t);
+    if(sub){const s=el("text",{x:x+w/2,y:y+h/2+14,"text-anchor":"middle",fill:css("--muted"),"font-size":11,"font-family":"var(--f-mono)"});s.textContent=sub;g.appendChild(s);}
+    svg.appendChild(g);
+  }
+  function arrow(x1,y1,x2,y2){svg.appendChild(el("line",{x1,y1,x2,y2,stroke:css("--faint"),"stroke-width":1.6,"marker-end":"url(#ah)"}));}
+  const defs=el("defs",{});const mk=el("marker",{id:"ah",markerWidth:8,markerHeight:8,refX:7,refY:4,orient:"auto"});
+  mk.appendChild(el("path",{d:"M0,0 L8,4 L0,8 z",fill:css("--faint")}));defs.appendChild(mk);svg.appendChild(defs);
+  box(14,100,120,50,"Benchmark","600 scenarios");
+  arrow(134,125,176,125);
+  box(176,70,130,110,"Qwen2.5","7B · 14B · 32B",css("--accent"));
+  const sub=el("text",{x:241,y:196,"text-anchor":"middle",fill:css("--faint"),"font-size":10.5,"font-family":"var(--f-mono)"});sub.textContent="Ollama · D0 · temp 0";svg.appendChild(sub);
+  arrow(306,105,352,80); arrow(306,125,352,125); arrow(306,145,352,170);
+  box(352,55,150,46,"DeepSeek judge",null,css("--ds"));
+  box(352,108,150,36,"Haiku judge",null,css("--hk"));
+  box(352,152,150,46,"Sandbox oracle","deterministic",css("--exec"));
+  arrow(502,78,548,100); arrow(502,126,548,120); arrow(502,174,548,140);
+  box(548,95,118,54,"Metrics","ASR · harm");
+  host.appendChild(svg);
+}
+
+/* ---------------- readout widget ---------------- */
+let roJudge="ds";
+function drawRO(){
+  const d=RO[roJudge];
+  $("#readout").innerHTML=`
+    <div class="ro"><div class="k">7B ASR</div><div class="v">${d.a7}%</div></div>
+    <div class="ro"><div class="k">32B ASR</div><div class="v">${d.a32}%</div></div>
+    <div class="ro"><div class="k">7B→32B change</div><div class="v">${d.d} pts</div></div>
+    <div class="ro"><div class="k">Odds ratio / step</div><div class="v">${d.or}×</div></div>
+    <div class="ro"><div class="k">significance</div><div class="v" style="font-size:1rem">p=${d.p}</div></div>`;
+  $("#verdict").textContent=d.verdict;
+}
+
+/* ---------------- controls ---------------- */
+function wireSeg(id,attr,set){
+  const grp=$(id);
+  grp.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
+    grp.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed","false"));
+    b.setAttribute("aria-pressed","true");set(b.dataset[attr]);});
+}
+wireSeg("#asrJudge","j",v=>{asrJudge=v;drawASR();});
+wireSeg("#heatJudge","j",v=>{heatJudge=v;drawHeat();});
+wireSeg("#cmModel","m",v=>{cmModel=v;drawCM();});
+wireSeg("#roJudge","j",v=>{roJudge=v;drawRO();});
+
+/* theme toggle */
+function sysDark(){return matchMedia("(prefers-color-scheme:dark)").matches;}
+function curDark(){const t=document.documentElement.getAttribute("data-theme");return t?t==="dark":sysDark();}
+function redraw(){drawASR();drawHeat();drawCM();drawTrunc();drawExec();drawPipe();}
+$("#themeBtn").addEventListener("click",()=>{
+  document.documentElement.setAttribute("data-theme",curDark()?"light":"dark");
+  requestAnimationFrame(redraw);
+});
+matchMedia("(prefers-color-scheme:dark)").addEventListener?.("change",()=>{if(!document.documentElement.getAttribute("data-theme"))redraw();});
+
+/* init */
+fillHeatTable();drawASR();drawHeat();drawCM();drawTrunc();drawExec();drawPipe();drawRO();
+addEventListener("resize",()=>{clearTimeout(window._rt);window._rt=setTimeout(redraw,180);});
+</script>
