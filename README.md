@@ -127,11 +127,16 @@ errors by scenario, implemented directly (no `statsmodels` dependency).
 ## What's in here
 
 ```
-report/           the interactive report (index.html) — GitHub Pages entry point
-analysis/         analysis.py (all tables + figures) and score_adjudication.py
-data/             aggregated tables + per-scenario verdicts & metrics (NO raw model responses)
+README.md                     this page
+PREREGISTRATION_followup.md   the follow-up's hypotheses and decision rules, committed before any follow-up data existed
+VERIFICATION.md               what was checked, and what changed after review
+CITATION.cff                  how to cite
+report/           the interactive report (index.html, GitHub Pages entry point), the paper (PDF and DOCX) and FOLLOWUP_RESULTS.md
+analysis/         analysis.py and analysis_followup.py (tables + figures), recompute_headline.py, score_adjudication.py
+data/             aggregated tables + per-scenario verdicts & metrics, incl. the follow-up run (NO raw model responses)
 figures/          static PNG exports (light + dark) used in this README
-kit/              generation/judging scripts and repo patches  (add yours — see kit/README.md)
+kit/              generation/judging scripts and repo patches (see kit/README.md)
+docs/             runbooks and the follow-up run's summary tables
 ```
 
 **What is deliberately *not* here:** raw model responses, the attack prompts, and
