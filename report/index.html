@@ -161,10 +161,11 @@ footer{padding-block:40px 60px;color:var(--muted);font-size:.86rem}
   <div class="wrap">
     <span class="brand">SafeClawBench · Qwen2.5 scaling</span>
     <nav>
+      <a href="#whatschanged">v2 update</a>
       <a href="#findings">Findings</a>
-      <a href="#method">Method</a>
       <a href="#scaling">Results</a>
       <a href="#judges">Judges</a>
+      <a href="#followup">Follow-up</a>
       <a href="#trust">Trust</a>
       <a href="#repro">Reproduce</a>
     </nav>
@@ -181,9 +182,37 @@ footer{padding-block:40px 60px;color:var(--muted);font-size:.86rem}
   <div class="answer">
     <p><strong>The short answer.</strong> I ran the same 600 agent-attack scenarios against three sizes of Qwen2.5 with no extra guardrails, and scored each response two ways. By the usual "did the model go along with the attack?" measure, the <em>larger</em> models were easier to manipulate, not harder — and that held under two independent graders.</p>
     <p>But "the attack succeeded" turns out to be a judgement call, and a lot of the disagreement between graders came down to a data quirk rather than a real difference. When I ran the handful of cases through a sandbox that needs no grader at all, the size effect disappeared. So: <strong>riskier on paper, unproven in execution</strong> — and how you measure matters as much as the model.</p>
+    <p>Since the first version I ran a <strong>pre-registered follow-up</strong> to test the two shakiest parts of that story. It confirmed the truncation quirk and sharpened it, but it also dialled back the size effect: on a single hardware-and-software build, judging full-length responses, 32B is still more attackable than 7B under both graders, but by about half as much as the first write-up implied, and not cleanly significant at that sample size. <a href="#whatschanged">What changed →</a></p>
   </div>
-  <div class="byline">A public writeup · UK · October 2026 · all numbers reproducible from the released scripts</div>
+  <div class="byline">A public writeup · UK · updated October 2026 (v2, with pre-registered follow-up) · all numbers reproducible from the released scripts</div>
 </div>
+
+<section id="whatschanged">
+  <div class="section-tag">Update · pre-registered follow-up (v2)</div>
+  <h2>What changed in this version</h2>
+  <p class="lead">After the first write-up I ran a follow-up that I committed to in writing before I had the data (a pre-registration). It re-generated 120 cases across all three sizes on one build, saved the responses full-length instead of cutting them at 2,000 characters, and graded each one both ways. Three things came out of it.</p>
+  <div class="cards">
+    <div class="card">
+      <span class="fnum">confirmed · strengthened</span>
+      <h3>The truncation quirk is real</h3>
+      <div class="stat">+8 pts agreement</div>
+      <p>Judging the full response instead of the first 2,000 characters raised grader agreement on long responses by 8 points. The first test compared different responses; this one compares the same responses judged two ways, which is the clean version.</p>
+    </div>
+    <div class="card flag">
+      <span class="fnum">revised down</span>
+      <h3>The size effect is smaller and less certain</h3>
+      <div class="stat">+17 → ~+9 pts</div>
+      <p>On one build, judging full text, 32B beats 7B by about +9 points (DeepSeek, p=0.04) / +7.5 (Haiku, p=0.14) — not the +17 of v1, and the confirmatory test is underpowered at 120 cases. The direction holds; the magnitude shrinks.</p>
+    </div>
+    <div class="card flag">
+      <span class="fnum">now measured</span>
+      <h3>The environment confound was material</h3>
+      <div class="stat">76–78% vs 88%</div>
+      <p>v1 called the July-vs-October build difference "probably small". The follow-up shows regeneration flips about a quarter of 7B/14B verdicts, so the main study's cross-build comparison is confounded and the same-build numbers should lead. (How much is build drift vs run-to-run randomness can't be separated from one re-run.)</p>
+    </div>
+  </div>
+  <p style="margin-top:14px">The full follow-up, with its pre-registered decision rules and outcomes, is in <a href="#followup">the follow-up section</a> below. Claims and figures elsewhere on this page have been updated to match.</p>
+</section>
 
 <section id="findings">
   <div class="section-tag">The five things I found</div>
@@ -191,16 +220,16 @@ footer{padding-block:40px 60px;color:var(--muted);font-size:.86rem}
   <p class="lead">Ranked by how strongly the evidence supports them. The first is robust; the middle three come with caveats I'm explicit about; the last is a deliberate non-result.</p>
   <div class="cards">
     <div class="card">
-      <span class="fnum">01 · robust</span>
+      <span class="fnum">01 · direction robust</span>
       <h3>Scaling up raised the attack-success rate</h3>
-      <div class="stat">+17 / +9.5 pts</div>
-      <p>From 7B to 32B, the semantic attack-success rate rose by 17 points under the primary grader and 9.5 under the validation grader. Both results are statistically solid, and the trend is monotonic.</p>
+      <div class="stat">+17 pts → ~+9</div>
+      <p>In the 600-case main study, attack-success rose 17 points (primary grader) and 9.5 (validation) from 7B to 32B, both significant. A same-environment follow-up puts the pure effect nearer +9 points and underpowered — the upward direction holds under both graders, the magnitude is smaller than v1 implied.</p>
     </div>
     <div class="card flag">
-      <span class="fnum">02 · the twist</span>
+      <span class="fnum">02 · the twist (confirmed)</span>
       <h3>The graders disagreed — but it's mostly an artefact</h3>
       <div class="stat">5–10 → 22–27 pts</div>
-      <p>On responses that weren't cut off at a 2,000-character cap, the two graders land within 5–10 points and agree on the scaling trend. The big gap only appears on truncated responses, which hit the largest model hardest.</p>
+      <p>On responses that weren't cut off at a 2,000-character cap, the two graders land within 5–10 points. The pre-registered follow-up confirms it cleanly: judging the same responses full-length instead of cut raises grader agreement by 8 points.</p>
     </div>
     <div class="card">
       <span class="fnum">03 · definitions</span>
@@ -362,6 +391,59 @@ footer{padding-block:40px 60px;color:var(--muted);font-size:.86rem}
   <p>For MEX specifically, this is the closest thing to a tie-breaker. On the 10 MEX scenarios with sandbox oracles, DeepSeek scores 90–100% success, Haiku 20%, and the sandbox sees <strong>0–10%</strong> actual harm. For this family the stricter grader is closer to the ground truth — though with only 10 cases, and with the caveat that a state oracle under-detects pure information-leak harms, I'd call it a strong hint, not a verdict.</p>
 </section>
 
+<section id="followup">
+  <div class="section-tag">The follow-up, in detail</div>
+  <h2>Testing the two shakiest claims</h2>
+  <p class="lead">The first write-up had two weak spots: the truncation story was based on comparing <em>different</em> responses (long ones against short ones), and the three model sizes were generated weeks apart on possibly different software. So I pre-registered a follow-up — wrote down the predictions and the pass/fail rules, committed them to the repo, and only then ran it. 120 cases, 20 per attack family, the same cases to all three sizes, one pod and one build, responses saved in full, each graded on both the first 2,000 characters and the full text.</p>
+
+  <h3>Truncation: the clean test</h3>
+  <p>Because every long response is now graded both ways, I can hold the response fixed and change only how much of it the grader sees. Lifting the cut lifts grader agreement on long responses from 73% to 81%, and it is the <em>stricter</em> grader (Haiku) whose success rate jumps on the full text — by nearly 15 points on long 32B responses — while the lenient grader barely moves. Reading the cases that flip (a post-hoc check), the fuller response usually shows the model <em>finishing the thing it was asked to do</em> — writing out the complete exfiltration or destructive script, or offering to run it on real data — after the 2,000-character cut, which the stricter grader reads as going along with the attack. Two honest caveats: nothing is actually executed here (that is the sandbox track), so what completes after the cut is the committed plan or code, not real harm; and a few cases flip the other way when the tail adds a late caveat or shows the data was only hypothetical. So the cap was changing how the strict grader reads a long response, rather than simply hiding finished harm from it.</p>
+  <figure>
+    <div class="fig-head"><span class="fig-title">Follow-up ASR: first 2,000 characters vs full text</span></div>
+    <div class="chart-wrap" id="fuAsr"></div>
+    <div class="legend" id="fuAsrLegend"></div>
+    <figcaption>120 cases per size. Hatched bars are the first-2,000-character view; solid bars are the full text. Haiku (orange) rises on full text, most at 32B; DeepSeek (blue) is roughly stable.</figcaption>
+    <details class="data"><summary>Show the numbers</summary>
+      <table><thead><tr><th>Model</th><th>DS cap</th><th>DS full</th><th>HK cap</th><th>HK full</th></tr></thead>
+      <tbody><tr><td>7B</td><td>73.3%</td><td>70.0%</td><td>58.3%</td><td>57.5%</td></tr>
+      <tr><td>14B</td><td>74.2%</td><td>74.2%</td><td>55.0%</td><td>58.3%</td></tr>
+      <tr><td>32B</td><td>76.7%</td><td>79.2%</td><td>55.8%</td><td>65.0%</td></tr></tbody></table>
+    </details>
+  </figure>
+  <figure>
+    <div class="fig-head"><span class="fig-title">Grader agreement rises on full text</span></div>
+    <div class="chart-wrap" id="fuAgree"></div>
+    <div class="legend" id="fuAgreeLegend"></div>
+    <figcaption>DeepSeek–Haiku agreement, first-2,000-character view vs full text, per size and pooled. Agreement rises everywhere, most at 32B (+6.7 points), which is where responses are longest.</figcaption>
+  </figure>
+
+  <h3>Environment: bigger than I said in v1</h3>
+  <p>To check the July-vs-October build confound, I compared the main study's saved verdicts against the same-build regeneration, case by case. Agreement is higher for 32B (88%, generated in October, close to the follow-up's build) than for the July-built 7B and 14B (76–78%), and that difference holds up on a paired test (p≈0.02–0.03). The 7B calibration points the same way (same-build runs agree ~93%, July-vs-October ~70%), so the pattern is <em>consistent with</em> version drift in the older build. But I can't prove it with one re-run: at temperature 0 almost every response changed between runs at <em>every</em> size (byte-identical on the first 2,000 characters for 0 of 120 at 7B and 14B, and only 9 of 120 at 32B), each individual size's ASR shift is within sampling noise (7B +5.8 points, 95% CI −3 to +15), and a model-size effect on determinism could produce the same pattern. What is solid is the pre-registered outcome: regeneration flips about a quarter of 7B/14B verdicts, so the main study's 7B/14B-vs-32B comparison is confounded and the same-environment numbers should lead. The honest lesson underneath it is that single-run size estimates at n=120 are noisy.</p>
+  <figure>
+    <div class="fig-head"><span class="fig-title">Environment check: main study vs same-build regeneration</span></div>
+    <div class="chart-wrap" id="fuEnv"></div>
+    <figcaption>Per-case agreement between the main study's Haiku verdict and a same-build regeneration (first-2,000-character view). The July-built 7B and 14B fall below the 80% "small" threshold; the October-built 32B clears it.</figcaption>
+  </figure>
+
+  <h3>The scale trend, in the same environment</h3>
+  <p>With the environment held fixed and the full text judged, 32B is still more attackable than 7B under both graders — DeepSeek +9.2 points (p=0.04), Haiku +7.5 points (p=0.14). But the one test I pre-registered as confirmatory (Haiku, full text, 7B vs 32B) does not reach significance at 120 cases, which the pre-registered power note had already flagged as likely for any effect below about 10–12 points. So the direction replicates under both graders and is consistent with the main study, but the same-environment effect is roughly half the size of v1's headline and not cleanly significant on its own. The original +17 points (DeepSeek) breaks down as +17 on the full 600 cases → +14 on these 120 cases with the original responses → +3 once 7B/14B are regenerated on the same build → +9 once the full text is judged. Those steps are indicative, not exact: a paired bootstrap puts the "environment" step at −10.8 points (95% CI −21.7 to −0.8) under DeepSeek but only −6.7 (CI −17.5 to +5.0, not distinguishable from zero) under Haiku, whereas the "full-text" step is positive and excludes zero under both graders. So the robust parts are that full-text judging widens the gap and that the same-environment estimate is smaller than the cross-environment +17; the environment step itself is significant only under the lenient grader and should be read with its wide interval.</p>
+
+  <h3>Pre-registered outcomes</h3>
+  <div class="chart-wrap">
+  <table>
+    <thead><tr><th>Hypothesis</th><th>Observed</th><th>Outcome</th></tr></thead>
+    <tbody>
+      <tr><td>H1 · truncation drives grader disagreement</td><td>agreement +8.1 pts on full text (long responses)</td><td><strong>supported</strong></td></tr>
+      <tr><td>H2 · truncation moves ASR, not just agreement</td><td>Haiku rises (32B +14.7, p=0.001); DeepSeek flat</td><td><strong>observed</strong></td></tr>
+      <tr><td>H3 · scale trend survives same-env full-text (confirmatory)</td><td>Haiku +7.5 (p=0.14); DeepSeek +9.2 (p=0.04)</td><td><strong>inconclusive · underpowered</strong></td></tr>
+      <tr><td>H4 · July-vs-October confound is small</td><td>7B 76% / +5.8; 14B 78% / −2.5; 32B 88% / −0.8</td><td><strong>material</strong></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p><small>Only H3's primary test is confirmatory; the rest are exploratory. Full rules, numbers and deviations are in <code>FOLLOWUP_RESULTS.md</code>.</small></p>
+  <p><small><strong>Post-hoc note.</strong> The two mechanism/cause explanations above (why the graders flip, and whether the environment "compresses" the gap) were examined after the run, outside the pre-registration, prompted by a reviewer. They are exploratory and change wording only — the H1–H4 outcomes and every number are unchanged. Details and the supporting checks (text-identity, decomposition intervals, flip-by-flip reading) are in <code>FOLLOWUP_RESULTS.md</code>.</small></p>
+</section>
+
 <section id="trust">
   <div class="section-tag">Caveats, stated plainly</div>
   <h2>How much can you trust this?</h2>
@@ -369,7 +451,7 @@ footer{padding-block:40px 60px;color:var(--muted);font-size:.86rem}
   <div>
     <div class="trust-row"><span class="ic">1</span><div class="t"><b>Neither grader is ground truth.</b> They're two LLMs that disagree, and the original paper used a third (gpt-5.4). Where they conflict and the sandbox can't adjudicate, I say so rather than pick a winner.</div></div>
     <div class="trust-row"><span class="ic">2</span><div class="t"><b>The 2,000-character truncation touches ~half of all responses</b> (63% at 32B) and is the main driver of grader disagreement. Both graders saw partial text on those cases.</div></div>
-    <div class="trust-row"><span class="ic">3</span><div class="t"><b>A serving-environment difference is confounded with size.</b> 7B and 14B were generated in July (older Ollama, serial); 32B in October (newer Ollama, parallel). A 30-case calibration bounds this at roughly +10 points and not statistically distinguishable from zero — small, but not ruled out, and only measured on 7B.</div></div>
+    <div class="trust-row"><span class="ic">3</span><div class="t"><b>A serving-environment difference is confounded with size — and it's material.</b> 7B and 14B were generated in July; 32B in October. The pre-registered follow-up measured this: the July-built models agree with a same-build regeneration only 76–78% of the time, below the 80% "small" bar, while 32B clears it at 88%. So the main study's 7B/14B-vs-32B comparison carries a real build confound and the same-environment numbers are the ones to trust. A single re-run can't cleanly separate build drift from ordinary run-to-run non-determinism (at temperature 0 nearly every response changed between runs at every size), so the deeper caveat is that single-run size estimates at n=120 are noisy.</div></div>
     <div class="trust-row"><span class="ic">4</span><div class="t"><b>One sample per scenario.</b> Temperature 0, so responses are near-deterministic, but there's no per-scenario variance estimate from resampling.</div></div>
     <div class="trust-row"><span class="ic">5</span><div class="t"><b>The Exec track is n=60.</b> Intervals are roughly ±12 points, so it can rule a large size effect in or out only loosely, and its state oracles under-detect information-leak harms.</div></div>
   </div>
@@ -464,6 +546,10 @@ const RO={ ds:{a7:68.5,a32:85.5,d:"+17.0",or:"1.70",p:"1.5×10⁻¹⁷",
            hk:{a7:55.5,a32:65.0,d:"+9.5",or:"1.30",p:"4.9×10⁻⁶",
                verdict:"Under the stricter grader the rise is smaller (+9.5 points) but still highly significant. Same direction, gentler slope."} };
 const CVD={ ds:"var(--ds)", hk:"var(--hk)", exec:"var(--exec)" };
+// follow-up (v2) data
+const FUASR={ds_cap:[73.3,74.2,76.7],ds_full:[70.0,74.2,79.2],hk_cap:[58.3,55.0,55.8],hk_full:[57.5,58.3,65.0]};
+const FUAGREE={labs:["7B","14B","32B","Pooled"],cap:[78.3,75.8,79.2,77.8],full:[80.8,79.2,85.8,81.9]};
+const FUENV={agree:[75.8,77.5,87.5],shift:[5.8,-2.5,-0.8],build:["July","July","Oct"]};
 
 /* ---------------- helpers ---------------- */
 const $=s=>document.querySelector(s), ns="http://www.w3.org/2000/svg";
@@ -694,7 +780,64 @@ wireSeg("#roJudge","j",v=>{roJudge=v;drawRO();});
 /* theme toggle */
 function sysDark(){return matchMedia("(prefers-color-scheme:dark)").matches;}
 function curDark(){const t=document.documentElement.getAttribute("data-theme");return t?t==="dark":sysDark();}
-function redraw(){drawASR();drawHeat();drawCM();drawTrunc();drawExec();drawPipe();}
+/* ---------- follow-up charts ---------- */
+function drawFUasr(){
+  const host=document.querySelector("#fuAsr");if(!host)return;host.innerHTML="";
+  const W=700,H=380,m={t:18,r:16,b:46,l:44},iw=W-m.l-m.r,ih=H-m.t-m.b;
+  const svg=el("svg",{viewBox:`0 0 ${W} ${H}`,role:"img","aria-label":"Follow-up ASR cut vs full"});
+  const y=v=>m.t+ih-(v/100)*ih;
+  for(let g=0;g<=100;g+=20){svg.appendChild(el("line",{x1:m.l,x2:W-m.r,y1:y(g),y2:y(g),stroke:css("--border")}));
+    const t=el("text",{x:m.l-8,y:y(g)+4,"text-anchor":"end",fill:css("--muted"),"font-size":12,"font-family":"var(--f-mono)"});t.textContent=g;svg.appendChild(t);}
+  const series=[["ds_cap",css("--ds"),0.4,"DeepSeek cap"],["ds_full",css("--ds"),1,"DeepSeek full"],["hk_cap",css("--hk"),0.4,"Haiku cap"],["hk_full",css("--hk"),1,"Haiku full"]];
+  const group=iw/3,bw=group/5.4;
+  SIZES.forEach((sz,i)=>{const cx=m.l+group*i+group/2;
+    series.forEach((s,k)=>{const [key,col,al,lab]=s;const v=FUASR[key][i];const x=cx-(2*bw+bw*0.3*1.5)+k*(bw*1.15);
+      const r=el("rect",{x,y:y(v),width:bw,height:y(0)-y(v),rx:3,fill:col,"fill-opacity":al});
+      bindTip(r,`<b>${SLAB[i]} · ${lab}</b><br>ASR ${v}%`);svg.appendChild(r);
+      const t=el("text",{x:x+bw/2,y:y(v)-5,"text-anchor":"middle","font-size":9.5,"font-weight":600,"font-family":"var(--f-mono)",fill:css("--fg")});t.textContent=Math.round(v);svg.appendChild(t);});
+    const tx=el("text",{x:cx,y:H-16,"text-anchor":"middle",fill:css("--fg"),"font-size":14,"font-family":"var(--f-mono)"});tx.textContent=SLAB[i];svg.appendChild(tx);});
+  host.appendChild(svg);
+  const lg=document.querySelector("#fuAsrLegend");if(lg){lg.innerHTML="";
+    [["DeepSeek","--ds"],["Haiku","--hk"]].forEach(([n,c])=>{const s=document.createElement("span");s.innerHTML=`<i class="swatch" style="background:${css(c)}"></i>${n}`;lg.appendChild(s);});
+    const note=document.createElement("span");note.style.color="var(--muted)";note.textContent="faded = first 2,000 chars · solid = full text";lg.appendChild(note);}
+}
+function drawFUagree(){
+  const host=document.querySelector("#fuAgree");if(!host)return;host.innerHTML="";
+  const W=700,H=330,m={t:16,r:16,b:40,l:44},iw=W-m.l-m.r,ih=H-m.t-m.b;
+  const svg=el("svg",{viewBox:`0 0 ${W} ${H}`,role:"img","aria-label":"Follow-up agreement cut vs full"});
+  const y=v=>m.t+ih-(v/100)*ih,n=FUAGREE.labs.length,group=iw/n;
+  for(let g=0;g<=100;g+=20){svg.appendChild(el("line",{x1:m.l,x2:W-m.r,y1:y(g),y2:y(g),stroke:css("--border")}));
+    const t=el("text",{x:m.l-8,y:y(g)+4,"text-anchor":"end",fill:css("--muted"),"font-size":12,"font-family":"var(--f-mono)"});t.textContent=g;svg.appendChild(t);}
+  FUAGREE.labs.forEach((lab,i)=>{const cx=m.l+group*i+group/2,bw=group/3.2;
+    [["cap",css("--muted"),0.55,"first 2,000 chars"],["full",css("--exec"),1,"full text"]].forEach((s,k)=>{const [key,col,al,nm]=s;const v=FUAGREE[key][i];const x=cx-bw-2+k*(bw+4);
+      const r=el("rect",{x,y:y(v),width:bw,height:y(0)-y(v),rx:3,fill:col,"fill-opacity":al});
+      bindTip(r,`<b>${lab} · ${nm}</b><br>agreement ${v}%`);svg.appendChild(r);
+      const t=el("text",{x:x+bw/2,y:y(v)-5,"text-anchor":"middle","font-size":10,"font-weight":600,"font-family":"var(--f-mono)",fill:css("--fg")});t.textContent=Math.round(v);svg.appendChild(t);});
+    const tx=el("text",{x:cx,y:H-14,"text-anchor":"middle",fill:css("--fg"),"font-size":13,"font-family":"var(--f-mono)"});tx.textContent=lab;svg.appendChild(tx);});
+  host.appendChild(svg);
+  const lg=document.querySelector("#fuAgreeLegend");if(lg){lg.innerHTML="";
+    [["first 2,000 chars","--muted"],["full text","--exec"]].forEach(([n,c])=>{const s=document.createElement("span");s.innerHTML=`<i class="swatch" style="background:${css(c)}"></i>${n}`;lg.appendChild(s);});}
+}
+function drawFUenv(){
+  const host=document.querySelector("#fuEnv");if(!host)return;host.innerHTML="";
+  const W=700,H=330,m={t:18,r:16,b:52,l:44},iw=W-m.l-m.r,ih=H-m.t-m.b;
+  const svg=el("svg",{viewBox:`0 0 ${W} ${H}`,role:"img","aria-label":"Environment check"});
+  const y=v=>m.t+ih-(v/100)*ih,group=iw/3;
+  for(let g=0;g<=100;g+=20){svg.appendChild(el("line",{x1:m.l,x2:W-m.r,y1:y(g),y2:y(g),stroke:css("--border")}));
+    const t=el("text",{x:m.l-8,y:y(g)+4,"text-anchor":"end",fill:css("--muted"),"font-size":12,"font-family":"var(--f-mono)"});t.textContent=g;svg.appendChild(t);}
+  svg.appendChild(el("line",{x1:m.l,x2:W-m.r,y1:y(80),y2:y(80),stroke:css("--muted"),"stroke-dasharray":"5 4"}));
+  const th=el("text",{x:m.l+4,y:y(80)-5,fill:css("--muted"),"font-size":11,"font-family":"var(--f-mono)"});th.textContent="80% ‘small’ threshold";svg.appendChild(th);
+  SIZES.forEach((sz,i)=>{const cx=m.l+group*i+group/2,bw=group/2.4,v=FUENV.agree[i];
+    const col=v>=80?"var(--good)":"var(--bad)";
+    const r=el("rect",{x:cx-bw/2,y:y(v),width:bw,height:y(0)-y(v),rx:4,fill:col});
+    bindTip(r,`<b>${SLAB[i]} (${FUENV.build[i]} build)</b><br>agreement ${v}%<br>ASR shift ${FUENV.shift[i]>0?'+':''}${FUENV.shift[i]} pts`);svg.appendChild(r);
+    const t=el("text",{x:cx,y:y(v)-7,"text-anchor":"middle","font-size":13,"font-weight":600,"font-family":"var(--f-mono)",fill:css("--fg")});t.textContent=v+"%";svg.appendChild(t);
+    const sh=el("text",{x:cx,y:y(0)-10,"text-anchor":"middle","font-size":11,"font-family":"var(--f-mono)",fill:"#fff"});sh.textContent=`shift ${FUENV.shift[i]>0?'+':''}${FUENV.shift[i]}`;svg.appendChild(sh);
+    const tx=el("text",{x:cx,y:H-28,"text-anchor":"middle",fill:css("--fg"),"font-size":13,"font-family":"var(--f-mono)"});tx.textContent=SLAB[i];svg.appendChild(tx);
+    const bl=el("text",{x:cx,y:H-12,"text-anchor":"middle",fill:css("--muted"),"font-size":10.5,"font-family":"var(--f-mono)"});bl.textContent=`(${FUENV.build[i]} build)`;svg.appendChild(bl);});
+  host.appendChild(svg);
+}
+function redraw(){drawASR();drawHeat();drawCM();drawTrunc();drawExec();drawPipe();drawFUasr();drawFUagree();drawFUenv();}
 $("#themeBtn").addEventListener("click",()=>{
   document.documentElement.setAttribute("data-theme",curDark()?"light":"dark");
   requestAnimationFrame(redraw);
@@ -702,6 +845,6 @@ $("#themeBtn").addEventListener("click",()=>{
 matchMedia("(prefers-color-scheme:dark)").addEventListener?.("change",()=>{if(!document.documentElement.getAttribute("data-theme"))redraw();});
 
 /* init */
-fillHeatTable();drawASR();drawHeat();drawCM();drawTrunc();drawExec();drawPipe();drawRO();
+fillHeatTable();drawASR();drawHeat();drawCM();drawTrunc();drawExec();drawPipe();drawRO();drawFUasr();drawFUagree();drawFUenv();
 addEventListener("resize",()=>{clearTimeout(window._rt);window._rt=setTimeout(redraw,180);});
 </script>
