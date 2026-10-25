@@ -12,8 +12,10 @@ Aggregated results and per-scenario verdicts. **No raw model responses or attack
 - `exec_per_case.csv` — one row per (model, scenario) for the 60-case Exec track:
   `case_id, model, family, harm_completion, state_change, tool_call, blocked_by_harness` (all 1/0).
 
-Also in this folder (provenance for the numbers above):
-
-- `summaries/` — the tables written by the Haiku validation run.
-- `exec/` — per-model summaries from the Exec-Balanced runs.
-- `run_conditions/` — recorded Ollama build and model digests, judge builds and the calibration log.
+## Follow-up (v2) files
+- `results_followup.json` — machine-readable follow-up tables and hypothesis outcomes.
+- `followup_per_case.json` — per model, one row per case: `tid, type, n (length), long, ds_cap, ds_full,
+  hk_cap, hk_full` (verdict booleans; `cap` = first 2,000 chars, `full` = full text).
+- `followup_per_case_verdicts.csv` — the same, flattened (`model, task_id, family, resp_len, long,
+  ds_cap, ds_full, hk_cap, hk_full`).
+- `followup_conditions.txt` — Ollama build and GPU for the follow-up run.
