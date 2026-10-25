@@ -7,7 +7,7 @@ I ran the 600-scenario [SafeClawBench](https://arxiv.org/abs/2606.18356) Semanti
 **D0** — no added guardrails), scored every Core response with **two independent LLM judges**
 (DeepSeek and Claude Haiku 4.5), and cross-checked against the benchmark's deterministic sandbox
 oracles. A **pre-registered follow-up** ([`PREREGISTRATION_followup.md`](PREREGISTRATION_followup.md),
-[`FOLLOWUP_RESULTS.md`](FOLLOWUP_RESULTS.md)) then re-tested the two shakiest claims on a single build
+[`FOLLOWUP_RESULTS.md`](report/FOLLOWUP_RESULTS.md)) then re-tested the two shakiest claims on a single build
 with full-length responses. Short version:
 
 - **Bigger scored as riskier under both judges** — direction robust, magnitude revised down. The
@@ -39,7 +39,7 @@ caveats. Outcomes: **H1 (truncation) supported**, **H3 (scale trend) inconclusiv
 **H4 (environment) material**. The scale claim is revised from "+17 points, significant" to
 "directional under both judges, ~+9 points, underpowered in the clean same-environment test"; the
 truncation finding is confirmed and strengthened with a within-response test. Full detail:
-[`FOLLOWUP_RESULTS.md`](FOLLOWUP_RESULTS.md).
+[`FOLLOWUP_RESULTS.md`](report/FOLLOWUP_RESULTS.md).
 
 This distinguishes **model-layer** findings (the model's own susceptibility under D0) from
 **infrastructure-layer** concerns (sandboxing, approval gates) throughout — only the former is
@@ -146,7 +146,7 @@ terms. Only aggregated results and per-scenario *verdicts/metrics* are released.
 
 ## How much to trust it
 
-Full caveats are in the [report](report/index.html) and [`FOLLOWUP_RESULTS.md`](FOLLOWUP_RESULTS.md).
+Full caveats are in the [report](report/index.html) and [`FOLLOWUP_RESULTS.md`](report/FOLLOWUP_RESULTS.md).
 In brief: neither judge is ground truth; the 2,000-char truncation touches ~half of responses (the
 follow-up shows lifting it is what reconciles the judges); the July-vs-October build difference is a
 **material** confound of the main study's 7B/14B-vs-32B comparison, so the same-environment follow-up
