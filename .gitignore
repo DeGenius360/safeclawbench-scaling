@@ -12,3 +12,5 @@ out/
 .env
 *.key
 .DS_Store
+blind_adjudication*
+followup_v2_*
